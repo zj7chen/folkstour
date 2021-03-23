@@ -1,0 +1,5 @@
+node_modules/
+firebase-adminsdk.json
+.next/
+.env.local
+cities.json

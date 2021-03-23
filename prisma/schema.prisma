@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Trip {
+  id                Int           @id @default(autoincrement())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  departureLocation String
+  arrivalLocation   String
+  transportation    Transport
+  description       String
+  teamSize          Int
+  author            User          @relation(fields: [authorId], references: [id])
+  authorId          String
+  expectedExpense   Decimal
+  genderRequirement Gender
+  reservations      Reservation[]
+}
+
+enum Transport {
+  DRIVING
+  CYCLING
+  TREKKING
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  ANY
+}
+
+model Reservation {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  tripId Int
+  trip   Trip   @relation(fields: [tripId], references: [id])
+}
+
+model User {
+  id        String @id
+  selfIntro String @default("")
+
+  // TODO user experience rank system
+  reservations Reservation[]
+  trips        Trip[]
+}

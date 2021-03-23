@@ -1,0 +1,27 @@
+{
+  "name": "trip",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "@prisma/client": "^2.18.0",
+    "bootstrap": "^4.6.0",
+    "firebase": "^8.2.10",
+    "firebase-admin": "^9.5.0",
+    "next": "^10.0.7",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.5.0",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "prisma": "^2.18.0"
+  }
+}
