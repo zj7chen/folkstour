@@ -15,8 +15,11 @@
     "bootstrap": "^4.6.0",
     "firebase": "^8.2.10",
     "firebase-admin": "^9.5.0",
+    "formik": "^2.2.6",
+    "fuse.js": "^6.4.6",
     "next": "^10.0.7",
     "react": "^17.0.1",
+    "react-autosuggest": "^10.1.0",
     "react-bootstrap": "^1.5.0",
     "react-dom": "^17.0.1"
   },

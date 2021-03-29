@@ -1,11 +1,14 @@
 import NavBar from "components/NavBar";
-import TripForm from "components/TripForm";
+import CreateTripForm from "components/CreateTripForm";
+import Container from "react-bootstrap/Container";
 
 function HomePage() {
   return (
     <div>
       <NavBar />
-      <TripForm />
+      <Container fluid="lg">
+        <CreateTripForm />
+      </Container>
     </div>
   );
 }
