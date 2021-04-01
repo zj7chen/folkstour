@@ -13,6 +13,7 @@ function CreateTripForm(props) {
   const teamSize = router.query.teamsize ?? "1-3";
 
   // transport allowed: "driving", "cycling", "trekking"
+  // ?.是做什么的？ split() 不是不改original string吗？
   const transport = router.query.transport?.split() ?? [];
 
   // teamSize options: "any", "male", "female"

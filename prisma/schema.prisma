@@ -16,6 +16,10 @@ model Trip {
   updatedAt         DateTime      @updatedAt
   departureLocation String
   arrivalLocation   String
+  // 这里用 DateTime 作为 type合理吗？
+  tripBeginTime     DateTime
+  tripEndTime       DateTime
+  // **************************
   transportation    Transport
   description       String
   teamSize          Int

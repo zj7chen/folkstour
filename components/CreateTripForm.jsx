@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-// import Form from "react-bootstrap/Form";
 import LocationInput from "components/LocationInput";
+import DateInput from "components/DateInput";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 function CreateTripForm(props) {
@@ -20,6 +18,8 @@ function CreateTripForm(props) {
         const errors = {};
         return errors;
       }}
+      // 这个set time out做什么？
+      // 需要加个 resetForm() 吗？
       onSubmit={(values, { setSubmitting }) => {
         setTimeout(() => {
           alert(JSON.stringify(values, null, 2));
@@ -34,8 +34,21 @@ function CreateTripForm(props) {
             id="departure"
             name="departure"
             component={LocationInput}
-            placeholder="Where do you want to meet?"
+            placeholder="Where do you start?"
           />
+
+          <label htmlFor="destination">Destination</label>
+          <Field
+            id="destination"
+            name="destination"
+            component={LocationInput}
+            placeholder="Where do you go?"
+          />
+
+          <label htmlFor="travelDates">Choose your dates</label>
+          {/* 是否该用 br 来 换行？*/}
+          <br></br>
+          <Field id="travelDates" name="travelDates" component={DateInput} />
 
           <div id="teamSizeGroup">Team Size</div>
           <div role="group" aria-labelledby="teamSizeGroup">
@@ -77,9 +90,14 @@ function CreateTripForm(props) {
             </label>
           </div>
 
-          <label htmlFor="expense">Expense estimate (day)</label>
+          <label htmlFor="expense">Expense estimate ($/day)</label>
+          {/* 是否该用 br 来 换行？*/}
+          <br></br>
           <Field id="expense" name="expense" placeholder="e.g. 300" />
 
+          {/* 是否该用 br 来 换行？*/}
+          <br></br>
+          <br></br>
           <button type="submit" disabled={isSubmitting}>
             Submit
           </button>
