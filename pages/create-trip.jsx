@@ -2,13 +2,15 @@ import NavBar from "components/NavBar";
 import CreateTripForm from "components/CreateTripForm";
 import Container from "react-bootstrap/Container";
 
-function HomePage() {
+function CreateTripPage() {
   return (
     <div>
       <NavBar />
-      <Container fluid="lg"></Container>
+      <Container fluid="lg">
+        <CreateTripForm />
+      </Container>
     </div>
   );
 }
 
-export default HomePage;
+export default CreateTripPage;

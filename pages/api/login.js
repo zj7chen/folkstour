@@ -16,22 +16,23 @@ function handler(req, res) {
         const maxAge = 60 * 60 * 24 * 5;
         return admin
           .auth()
-          .createSessionCookie(idToken, { expiresIn: maxAge * 1000 });
-      })
-      .then((sessionCookie) => {
-        res.setHeader(
-          "Set-Cookie",
-          `session=${sessionCookie}; Max-Age=${maxAge}; HttpOnly; Secure; Path=/`
-        );
-        res.end();
-        // A page redirect would suffice as the persistence is set to NONE.
-        return firebase.auth().signOut();
+          .createSessionCookie(idToken, { expiresIn: maxAge * 1000 })
+          .then((sessionCookie) => {
+            res.setHeader(
+              "Set-Cookie",
+              `session=${sessionCookie}; Max-Age=${maxAge}; HttpOnly; Secure; Path=/`
+            );
+            res.json({});
+            // A page redirect would suffice as the persistence is set to NONE.
+            return firebase.auth().signOut();
+          });
       })
       .catch((error) => {
-        res.status(401).send("UNAUTHORIZED REQUEST!");
+        console.log(error);
+        res.status(401).send({ message: "Unauthorized" });
       });
   } else {
-    res.status(405).end();
+    res.status(405).json({ message: "Method not allowed" });
   }
 }
 

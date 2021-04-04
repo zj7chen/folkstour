@@ -3,6 +3,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
+import submit from "client/submit";
 
 function Login(props) {
   const [signingUp, setSigningUp] = useState(false);
@@ -25,50 +26,28 @@ function Login(props) {
   function signup(e) {
     e.preventDefault();
     setError("");
-    fetch("/api/signup", {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    }).then((res) => {
-      if (res.status === 200) {
+    submit("/api/signup", { email, password }).then(
+      () => {
         setShowConfirm(true);
-        // if onHide is undefined, the expression will return undefined, else call function
-        //props.onHide?.();
-      } else {
-        res.json().then((error) => {
-          setError(error.message);
-        });
+      },
+      (error) => {
+        setError(error.message);
       }
-    });
+    );
   }
 
   function login(e) {
     e.preventDefault();
     setError("");
-    fetch("/api/login", {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    }).then((res) => {
-      if (res.status === 200) {
+    submit("/api/login", { email, password }).then(
+      () => {
         // if onHide is undefined, the expression will return undefined, else call function
         props.onHide?.();
-      } else {
-        res.json().then((error) => {
-          setError(error.message);
-        });
+      },
+      (error) => {
+        setError(error.message);
       }
-    });
+    );
   }
 
   return (

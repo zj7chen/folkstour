@@ -10,30 +10,38 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model TripLocation {
+  id       Int  @id @default(autoincrement())
+  tripId   Int
+  trip     Trip @relation(fields: [tripId], references: [id])
+  // {city, province, country}
+  location Json
+  order    Int
+}
+
 model Trip {
-  id                Int           @id @default(autoincrement())
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  departureLocation String
-  arrivalLocation   String
-  // 这里用 DateTime 作为 type合理吗？
+  id                Int            @id @default(autoincrement())
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  title             String
   tripBeginTime     DateTime
   tripEndTime       DateTime
-  // **************************
-  transportation    Transport
+  // Any subset of Json array => [cycling, driving, trekking]
+  transport         Json
   description       String
-  teamSize          Int
-  author            User          @relation(fields: [authorId], references: [id])
+  teamSize          TeamSize
+  author            User           @relation(fields: [authorId], references: [id])
   authorId          String
   expectedExpense   Decimal
   genderRequirement Gender
   reservations      Reservation[]
+  locations         TripLocation[]
 }
 
-enum Transport {
-  DRIVING
-  CYCLING
-  TREKKING
+enum TeamSize {
+  ONE_THREE
+  FOUR_SIX
+  ANY
 }
 
 enum Gender {

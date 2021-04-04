@@ -16,7 +16,7 @@ function handler(req, res) {
           })
           .then(() => {
             console.log("Successfully created new user:", userRecord.uid);
-            res.status(200).end();
+            res.status(200).json({});
           });
       })
       .catch((error) => {
@@ -24,7 +24,7 @@ function handler(req, res) {
         res.status(404).json({ message: error.message });
       });
   } else {
-    res.status(405).end();
+    res.status(405).json({ message: "Method not allowed" });
   }
 }
 

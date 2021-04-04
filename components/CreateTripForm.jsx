@@ -1,12 +1,14 @@
 import LocationInput from "components/LocationInput";
 import DateInput from "components/DateInput";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import submit from "client/submit";
+import RouteMap from "./RouteMap";
 
 function CreateTripForm(props) {
   return (
     <Formik
       initialValues={{
-        departure: null,
+        locations: [],
         // teamSize options: "1-3", "4-6", "any"
         teamSize: "1-3",
         // transport allowed: "driving", "cycling", "trekking"
@@ -18,32 +20,30 @@ function CreateTripForm(props) {
         const errors = {};
         return errors;
       }}
-      // 这个set time out做什么？
-      // 需要加个 resetForm() 吗？
       onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
+        submit("/api/create-trip", values).finally(() => {
           setSubmitting(false);
-        }, 400);
+        });
       }}
     >
       {({ isSubmitting }) => (
         <Form>
-          <label htmlFor="departure">Departure</label>
+          <label htmlFor="title">Title</label>
           <Field
-            id="departure"
-            name="departure"
-            component={LocationInput}
-            placeholder="Where do you start?"
+            id="title"
+            name="title"
+            placeholder="Give your trip an attractive title"
           />
 
-          <label htmlFor="destination">Destination</label>
+          <label htmlFor="locations">Locations</label>
           <Field
-            id="destination"
-            name="destination"
+            id="locations"
+            name="locations"
             component={LocationInput}
-            placeholder="Where do you go?"
+            placeholder="Enter the places of your trip"
           />
+
+          <RouteMap />
 
           <label htmlFor="travelDates">Choose your dates</label>
           {/* 是否该用 br 来 换行？*/}
@@ -94,6 +94,14 @@ function CreateTripForm(props) {
           {/* 是否该用 br 来 换行？*/}
           <br></br>
           <Field id="expense" name="expense" placeholder="e.g. 300" />
+
+          <label htmlFor="description">Description</label>
+          <Field
+            id="description"
+            name="description"
+            as="textarea"
+            placeholder="Please state any further details about the trip here"
+          />
 
           {/* 是否该用 br 来 换行？*/}
           <br></br>

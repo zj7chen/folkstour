@@ -6,7 +6,7 @@ import AsyncSelect from "react-select/async";
 const cityList = [];
 for (const [country, provinces] of Object.entries(countries)) {
   for (const [province, cities] of Object.entries(provinces)) {
-    for (const city of cities) {
+    for (const [city] of Object.entries(cities)) {
       cityList.push({ country, province, city });
     }
   }
@@ -22,19 +22,21 @@ function locationToString(location) {
 }
 
 function LocationInput(props) {
-  const [value, setValue] = useState(null);
   const [handle, setHandle] = useState();
-  console.log(value);
 
   return (
     <AsyncSelect
       id={props.field.id}
       name={props.field.name}
       value={props.form.value}
-      onChange={({ value }) =>
-        props.form.setFieldValue(props.field.name, value)
-      }
+      onChange={(selected) => {
+        props.form.setFieldValue(
+          props.field.name,
+          selected.map(({ value }) => value)
+        );
+      }}
       placeholder={props.placeholder}
+      isMulti
       cacheOptions
       loadOptions={(inputValue, callback) => {
         clearTimeout(handle);
@@ -50,7 +52,6 @@ function LocationInput(props) {
           }, 300)
         );
       }}
-      // 这又是啥？其余by default？
       defaultOptions
     />
   );
