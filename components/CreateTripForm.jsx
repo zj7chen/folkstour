@@ -3,11 +3,13 @@ import DateInput from "components/DateInput";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import submit from "client/submit";
 import RouteMap from "./RouteMap";
+import countries from "cities.json";
 
 function CreateTripForm(props) {
   return (
     <Formik
       initialValues={{
+        // {country, province, city}[]
         locations: [],
         // teamSize options: "1-3", "4-6", "any"
         teamSize: "1-3",
@@ -26,7 +28,7 @@ function CreateTripForm(props) {
         });
       }}
     >
-      {({ isSubmitting }) => (
+      {({ values, isSubmitting }) => (
         <Form>
           <label htmlFor="title">Title</label>
           <Field
@@ -43,7 +45,11 @@ function CreateTripForm(props) {
             placeholder="Enter the places of your trip"
           />
 
-          <RouteMap />
+          <RouteMap
+            locations={values.locations.map(
+              (city) => countries[city.country][city.province][city.city]
+            )}
+          />
 
           <label htmlFor="travelDates">Choose your dates</label>
           {/* 是否该用 br 来 换行？*/}
