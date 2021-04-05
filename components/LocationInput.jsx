@@ -2,6 +2,7 @@ import countries from "cities.json";
 import Fuse from "fuse.js";
 import React, { useState } from "react";
 import AsyncSelect from "react-select/async";
+import { displayLocation } from "client/display";
 
 const cityList = [];
 for (const [country, provinces] of Object.entries(countries)) {
@@ -15,11 +16,6 @@ for (const [country, provinces] of Object.entries(countries)) {
 const fuse = new Fuse(cityList, {
   keys: ["country", "province", "city"],
 });
-
-function locationToString(location) {
-  if (!location) return "";
-  return `${location.city}, ${location.province}, ${location.country}`;
-}
 
 function LocationInput(props) {
   const [handle, setHandle] = useState();
@@ -46,7 +42,7 @@ function LocationInput(props) {
             callback(
               result.map(({ item }) => ({
                 value: item,
-                label: locationToString(item),
+                label: displayLocation(item),
               }))
             );
           }, 300)

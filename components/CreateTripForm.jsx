@@ -5,6 +5,12 @@ import submit from "client/submit";
 import RouteMap from "./RouteMap";
 import countries from "cities.json";
 
+// date: must be moment.js date
+function localToISODate(date) {
+  console.log(date);
+  return new Date(date.format("YYYY-MM-DD") + "T00:00:00.000Z").toISOString();
+}
+
 function CreateTripForm(props) {
   return (
     <Formik
@@ -22,8 +28,12 @@ function CreateTripForm(props) {
         const errors = {};
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        submit("/api/create-trip", values).finally(() => {
+      onSubmit={({ travelDates, ...values }, { setSubmitting }) => {
+        submit("/api/create-trip", {
+          tripBeginTime: localToISODate(travelDates.start),
+          tripEndTime: localToISODate(travelDates.end),
+          ...values,
+        }).finally(() => {
           setSubmitting(false);
         });
       }}
