@@ -6,7 +6,7 @@ function HomePage() {
   return (
     <div>
       <NavBar />
-      <Container fluid="lg"></Container>
+      <Container fluid="xl"></Container>
     </div>
   );
 }

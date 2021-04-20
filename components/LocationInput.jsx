@@ -1,8 +1,10 @@
 import countries from "cities.json";
+import { displayLocation } from "client/display";
 import Fuse from "fuse.js";
 import React, { useState } from "react";
 import AsyncSelect from "react-select/async";
-import { displayLocation } from "client/display";
+
+// type City = { country: string, province: string, city: string }
 
 const cityList = [];
 for (const [country, provinces] of Object.entries(countries)) {
@@ -17,34 +19,42 @@ const fuse = new Fuse(cityList, {
   keys: ["country", "province", "city"],
 });
 
+function cityToOption(value) {
+  return { value, label: displayLocation(value) };
+}
+
+// props: {
+//   value: City
+//   onChange: (val: City) => void
+// }
 function LocationInput(props) {
   const [handle, setHandle] = useState();
 
   return (
     <AsyncSelect
-      id={props.field.id}
-      name={props.field.name}
-      value={props.form.value}
-      onChange={(selected) => {
-        props.form.setFieldValue(
-          props.field.name,
-          selected.map(({ value }) => value)
-        );
-      }}
+      id={props.id}
+      name={props.name}
+      value={
+        props.isMulti
+          ? props.value.map((c) => cityToOption(c))
+          : props.value
+          ? cityToOption(props.value)
+          : null
+      }
+      onChange={(selected) =>
+        props.onChange(
+          props.isMulti ? selected.map((o) => o.value) : selected.value
+        )
+      }
       placeholder={props.placeholder}
-      isMulti
+      isMulti={props.isMulti}
       cacheOptions
       loadOptions={(inputValue, callback) => {
         clearTimeout(handle);
         setHandle(
           setTimeout(() => {
             const result = fuse.search(inputValue, { limit: 4 });
-            callback(
-              result.map(({ item }) => ({
-                value: item,
-                label: displayLocation(item),
-              }))
-            );
+            callback(result.map(({ item }) => cityToOption(item)));
           }, 300)
         );
       }}

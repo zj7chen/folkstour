@@ -20,29 +20,41 @@ model TripLocation {
   order    Int
 }
 
+model TripTransport {
+  id        Int       @id @default(autoincrement())
+  tripId    Int
+  trip      Trip      @relation(fields: [tripId], references: [id])
+  transport Transport
+}
+
 model Trip {
-  id                Int            @id @default(autoincrement())
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id                Int             @id @default(autoincrement())
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
   title             String
   tripBeginTime     DateTime
   tripEndTime       DateTime
-  // Any subset of Json array => [cycling, driving, trekking]
-  transport         Json
   description       String
   teamSize          TeamSize
-  author            User           @relation(fields: [authorId], references: [id])
+  author            User            @relation(fields: [authorId], references: [id])
   authorId          String
   expectedExpense   Decimal
   genderRequirement Gender
   reservations      Reservation[]
   locations         TripLocation[]
+  transports        TripTransport[]
 }
 
 enum TeamSize {
   ONE_THREE
   FOUR_SIX
   ANY
+}
+
+enum Transport {
+  CYCLING
+  DRIVING
+  TREKKING
 }
 
 enum Gender {
@@ -57,11 +69,14 @@ model Reservation {
   user   User   @relation(fields: [userId], references: [id])
   tripId Int
   trip   Trip   @relation(fields: [tripId], references: [id])
+
+  @@unique([tripId, userId])
 }
 
 model User {
   id        String @id
   selfIntro String @default("")
+  avatar    Bytes?
 
   // TODO user experience rank system
   reservations Reservation[]

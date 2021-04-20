@@ -1,97 +1,150 @@
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import ToggleButton from "react-bootstrap/ToggleButton";
 import LocationInput from "components/LocationInput";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { useRouter } from "next/router";
+import DateInput from "components/DateInput";
+import { TEAM_SIZES, TEAM_SIZE_DEFAULT, TRANSPORTS } from "client/choices";
 
-function CreateTripForm(props) {
-  const [departure, setDeparture] = useState(null);
-  const [destination, setDestination] = useState(null);
+function useInput(state, f) {
+  const [value, setValue] = useState(f(state));
 
+  // useEffect() executes callback only if the [state] have changed between renderings
+  useEffect(() => {
+    setValue(f(state));
+  }, [state]);
+
+  return [value, setValue];
+}
+
+// update dates [start, end]
+function parseDates(dates) {
+  if (!dates) return { start: null, end: null };
+  const [start, end] = dates.split(",");
+  return { start, end };
+}
+
+function SearchTripForm(props) {
   const router = useRouter();
-  // teamSize options: "1-3", "4-6", "any"
-  const teamSize = router.query.teamsize ?? "1-3";
 
+  const [title, setTitle] = useInput(router.query.title, (d) => d ?? "");
+  const location = router.query.location
+    ? JSON.parse(router.query.location)
+    : null;
+  const [dates, setDates] = useInput(router.query.dates, parseDates);
+  // teamSize options: "ONE_THREE", "FOUR_SIX", "ANY"
+  const teamSize = router.query.teamsize ?? TEAM_SIZE_DEFAULT;
   // transport allowed: "driving", "cycling", "trekking"
-  // ?.是做什么的？ split() 不是不改original string吗？
-  const transport = router.query.transport?.split() ?? [];
+  const transports = router.query.transports
+    ? router.query.transports.split(",")
+    : [];
+  // -1 means unrestricted estimate expense
+  const [expense, setExpense] = useInput(router.query.expense, (d) => d ?? "");
 
-  // teamSize options: "any", "male", "female"
-  const gender = router.query.gender ?? "any";
+  function update(changes) {
+    // FIXME: prevent navigation on unchanged params
+    const query = { ...router.query, ...changes };
+    router.push({ query });
+  }
 
   return (
     <Form>
-      <LocationInput
-        id="departure"
-        label="Departure"
-        value={departure}
-        onChange={setDeparture}
-      />
-      <LocationInput
-        id="destination"
-        label="Destination"
-        value={destination}
-        onChange={setDestination}
-      />
-      {/*此处需要加入集合日期，用calendar做*/}
+      <Form.Group controlId="title">
+        <Form.Label>Title</Form.Label>
+        <Form.Control
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") update({ title });
+          }}
+          onBlur={() => update({ title })}
+          placeholder="Narrow by trip title"
+        />
+      </Form.Group>
 
-      <div style={{ marginTop: 200 }} />
+      <Form.Group controlId="location">
+        <Form.Label>Location</Form.Label>
+        <LocationInput
+          name="location"
+          value={location}
+          onChange={(location) =>
+            update({ location: JSON.stringify(location) })
+          }
+          placeholder="Narrow by location"
+        />
+      </Form.Group>
 
-      <div>
+      <Form.Group controlId="dates">
+        <Form.Label>Choose your dates</Form.Label>
+        <DateInput
+          name="dates"
+          value={dates}
+          onChange={({ start, end }) => {
+            setDates({ start, end });
+            if (!start || !end) return;
+            update({
+              dates: [start, end].join(","),
+            });
+          }}
+        />
+      </Form.Group>
+
+      <Form.Group>
         <Form.Label>Team Size</Form.Label>
-        <Form.Check
-          type="radio"
-          id="teamsize_1-3"
-          name="teamsize"
-          value="1-3"
-          label="1-3"
-          checked={teamSize === "1-3"}
-        />
-        <Form.Check
-          type="radio"
-          id="teamsize_4-6"
-          name="teamsize"
-          value="4-6"
-          label="4-6"
-          checked={teamSize === "4-6"}
-        />
-        <Form.Check
-          type="radio"
-          id="teamsize_any"
-          name="teamsize"
-          value="any"
-          label="Any"
-          checked={teamSize === "any"}
-        />
-      </div>
+        <ButtonGroup className="d-block">
+          {Object.entries(TEAM_SIZES).map(([key, { displayText }]) => (
+            <Button
+              key={key}
+              variant={teamSize === key ? "primary" : "outline-primary"}
+              onClick={() => update({ teamsize: key })}
+            >
+              {displayText}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </Form.Group>
 
-      <div>
-        <Form.Group>Transportation</Form.Group>
-        <Button variant="primary" onClick={() => setDriving(true)}>
-          Driving
-        </Button>
-        <Button variant="primary" onClick={() => setCycling(true)}>
-          Cycling
-        </Button>
-        <Button variant="primary" onClick={() => setTrekking(true)}>
-          Trekking
-        </Button>
-      </div>
+      <Form.Group>
+        <Form.Label>Transport</Form.Label>
+        <div>
+          {Object.entries(TRANSPORTS).map(([key, { displayText }]) => (
+            <Form.Check
+              inline
+              id={`transport-${key}`}
+              key={key}
+              label={displayText}
+              checked={transports.indexOf(key) !== -1}
+              type="checkbox"
+              onChange={(e) =>
+                update({
+                  transports: (e.target.checked
+                    ? [...transports, key]
+                    : transports.filter((t) => t !== key)
+                  ).join(","),
+                })
+              }
+            />
+          ))}
+        </div>
+      </Form.Group>
 
-      <div>
-        <Form.Group>Gender Requirement</Form.Group>
-        <Button variant="primary" onClick={() => setSexMale(true)}>
-          Male
-        </Button>
-        <Button variant="primary" onClick={() => setSexFemale(true)}>
-          Female
-        </Button>
-        <Button variant="primary" onClick={() => setSexAny(true)}>
-          Any
-        </Button>
-      </div>
+      <Form.Group controlId="expense">
+        <Form.Label>Expected Expense (under $/day)</Form.Label>
+        <Form.Control
+          type="number"
+          value={expense}
+          onChange={(e) => setExpense(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") update({ expense });
+          }}
+          onBlur={() => update({ expense })}
+          placeholder="e.g. 300"
+        />
+      </Form.Group>
     </Form>
   );
 }
 
-export default CreateTripForm;
+export default SearchTripForm;

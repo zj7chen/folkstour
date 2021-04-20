@@ -68,6 +68,7 @@ function Login(props) {
       </Modal>
 
       {/* Login / Signup Popup */}
+      {/* *************** TODO: Add gender of user when registering *************** */}
       <Modal show={!showConfirm} centered onHide={props.onHide}>
         <Modal.Header closeButton>
           <Modal.Title>{signingUp ? "Sign up" : "Login"}</Modal.Title>

@@ -1,39 +1,38 @@
-import LocationInput from "components/LocationInput";
-import DateInput from "components/DateInput";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import submit from "client/submit";
-import RouteMap from "./RouteMap";
 import countries from "cities.json";
+import submit from "client/submit";
+import DateInput from "components/DateInput";
+import LocationInput from "components/LocationInput";
+import { Field, Form, Formik } from "formik";
+import FormikAdaptor from "./FormikAdaptor";
+import RouteMap from "./RouteMap";
+import {
+  TEAM_SIZES,
+  TEAM_SIZE_DEFAULT,
+  TRANSPORTS,
+  GENDERS,
+  GENDER_DEFAULT,
+} from "client/choices";
 
-// date: must be moment.js date
-function localToISODate(date) {
-  console.log(date);
-  return new Date(date.format("YYYY-MM-DD") + "T00:00:00.000Z").toISOString();
-}
+const FormikLocation = FormikAdaptor(LocationInput);
+const FormikDate = FormikAdaptor(DateInput);
 
 function CreateTripForm(props) {
   return (
     <Formik
       initialValues={{
-        // {country, province, city}[]
+        // City[]
         locations: [],
-        // teamSize options: "1-3", "4-6", "any"
-        teamSize: "1-3",
-        // transport allowed: "driving", "cycling", "trekking"
-        transport: [],
-        // gender options: "any", "male", "female"
-        gender: "any",
+        dates: { start: null, end: null },
+        teamSize: TEAM_SIZE_DEFAULT,
+        transports: [],
+        gender: GENDER_DEFAULT,
       }}
       validate={(values) => {
         const errors = {};
         return errors;
       }}
-      onSubmit={({ travelDates, ...values }, { setSubmitting }) => {
-        submit("/api/create-trip", {
-          tripBeginTime: localToISODate(travelDates.start),
-          tripEndTime: localToISODate(travelDates.end),
-          ...values,
-        }).finally(() => {
+      onSubmit={(values, { setSubmitting }) => {
+        submit("/api/create-trip", values).finally(() => {
           setSubmitting(false);
         });
       }}
@@ -51,8 +50,9 @@ function CreateTripForm(props) {
           <Field
             id="locations"
             name="locations"
-            component={LocationInput}
+            component={FormikLocation}
             placeholder="Enter the places of your trip"
+            isMulti
           />
 
           <RouteMap
@@ -61,52 +61,39 @@ function CreateTripForm(props) {
             )}
           />
 
-          <label htmlFor="travelDates">Choose your dates</label>
-          {/* 是否该用 br 来 换行？*/}
+          <label htmlFor="dates">Choose your dates</label>
           <br></br>
-          <Field id="travelDates" name="travelDates" component={DateInput} />
+          <Field id="dates" name="dates" component={FormikDate} />
 
           <div id="teamSizeGroup">Team Size</div>
           <div role="group" aria-labelledby="teamSizeGroup">
-            <label>
-              <Field type="radio" name="teamSize" value="1-3" /> 1-3
-            </label>
-            <label>
-              <Field type="radio" name="teamSize" value="4-6" /> 4-6
-            </label>
-            <label>
-              <Field type="radio" name="teamSize" value="any" /> Any
-            </label>
+            {Object.entries(TEAM_SIZES).map(([key, { displayText }]) => (
+              <label>
+                <Field type="radio" name="teamSize" value={key} /> {displayText}
+              </label>
+            ))}
           </div>
 
-          <div id="transportGroup">Transport</div>
-          <div role="group" aria-labelledby="transportGroup">
-            <label>
-              <Field type="checkbox" name="transport" value="driving" /> Driving
-            </label>
-            <label>
-              <Field type="checkbox" name="transport" value="cycling" /> Cycling
-            </label>
-            <label>
-              <Field type="checkbox" name="transport" value="trekking" />{" "}
-              Trekking
-            </label>
+          <div id="transportsGroup">Transport</div>
+          <div role="group" aria-labelledby="transportsGroup">
+            {Object.entries(TRANSPORTS).map(([key, { displayText }]) => (
+              <label>
+                <Field type="checkbox" name="transports" value={key} />{" "}
+                {displayText}
+              </label>
+            ))}
           </div>
 
           <div id="genderGroup">Gender</div>
-          <div role="group" aria-labelledby="transportGroup">
-            <label>
-              <Field type="radio" name="gender" value="any" /> Any
-            </label>
-            <label>
-              <Field type="radio" name="gender" value="male" /> Male
-            </label>
-            <label>
-              <Field type="radio" name="gender" value="female" /> Female
-            </label>
+          <div role="group" aria-labelledby="genderGroup">
+            {Object.entries(GENDERS).map(([key, { displayText }]) => (
+              <label>
+                <Field type="radio" name="gender" value={key} /> {displayText}
+              </label>
+            ))}
           </div>
 
-          <label htmlFor="expense">Expense estimate ($/day)</label>
+          <label htmlFor="expense">Expense Estimate ($/day)</label>
           {/* 是否该用 br 来 换行？*/}
           <br></br>
           <Field id="expense" name="expense" placeholder="e.g. 300" />
