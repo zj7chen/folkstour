@@ -1,17 +1,27 @@
-import { displayLocation } from "client/display";
 import countries from "cities.json";
+import { displayLocation } from "client/display";
+import submit from "client/submit";
+import Avatar from "components/Avatar";
 import NavBar from "components/NavBar";
+import RouteMap from "components/RouteMap";
 import TripCapacity from "components/TripCapacity";
+import Link from "next/Link";
+import { useRouter } from "next/router";
+import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
-import RouteMap from "components/RouteMap";
 import admin from "server/server";
-import Button from "react-bootstrap/Button";
-import submit from "client/submit";
 
 function TripPage({ trip }) {
+  function isAuthor(reservation) {
+    return reservation.user.id === trip.authorId;
+  }
+
+  const author = trip.reservations.find(isAuthor).user;
+  console.log(trip.reserved);
+  const router = useRouter();
   return (
     <div>
       <NavBar />
@@ -20,12 +30,12 @@ function TripPage({ trip }) {
           <Col lg={8}>
             <Button
               variant={trip.reserved ? "danger" : "outline-success"}
-              // Why need async await for onClick?
               onClick={async () => {
                 await submit("/api/update-reservation", {
                   tripId: trip.id,
                   reserve: !trip.reserved,
                 });
+                router.replace(router.asPath);
               }}
             >
               {trip.reserved ? "Quit" : "Join"}
@@ -48,7 +58,6 @@ function TripPage({ trip }) {
             <h2>Team Capacity</h2>
             <TripCapacity
               teamSize={trip.teamSize}
-              // Can we get length from a relation?
               reservations={trip.reservations.length}
             />
             <h2>Expected Expense</h2>
@@ -63,7 +72,32 @@ function TripPage({ trip }) {
               )}
             />
           </Col>
-          <Col lg={4}>User Info</Col>
+          <Col lg={4}>
+            <h2>Founder</h2>
+            <Link href={`/profile?id=${author.id}`}>
+              <a>
+                <Avatar content={author.avatar} />
+                <span>{author.id}</span>
+              </a>
+            </Link>
+            <h2>Other Participants</h2>
+            <ul>
+              {trip.reservations
+                .filter((r) => !isAuthor(r))
+                .map(({ user: { id, avatar } }) => {
+                  return (
+                    <li key={id}>
+                      <Link href={`/profile?id=${id}`}>
+                        <a>
+                          <Avatar content={avatar} />
+                          <span>{id}</span>
+                        </a>
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </Col>
         </Row>
       </Container>
     </div>
@@ -112,7 +146,12 @@ export async function getServerSideProps({ req, query }) {
       },
       reservations: {
         select: {
-          userId: true,
+          user: {
+            select: {
+              id: true,
+              avatar: true,
+            },
+          },
         },
       },
     },
@@ -131,8 +170,10 @@ export async function getServerSideProps({ req, query }) {
         // {city, province, country}[]
         locations: locations.map(({ location }) => location),
         expectedExpense: expectedExpense.toJSON(),
-        reservations,
-        reserved: reservations.some((r) => r.userId === decodedClaims.uid),
+        reservations: reservations.map(({ user: { id, avatar } }) => ({
+          user: { id, avatar: avatar?.toString("base64") ?? null },
+        })),
+        reserved: reservations.some((r) => r.user.id === decodedClaims.uid),
       },
     },
   };

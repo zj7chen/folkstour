@@ -7,14 +7,12 @@ async function handler(req, res) {
     const avatar = req.body.avatar
       ? Buffer.from(req.body.avatar, "base64")
       : undefined;
-    console.log(avatar);
     const sessionCookie = req.cookies.session || "";
     // Verify the session cookie. In this case an additional check is added to detect
     // if the user's Firebase session was revoked, user deleted/disabled, etc.
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(sessionCookie, true);
-
     await prisma.user.update({
       where: {
         id: decodedClaims.uid,
