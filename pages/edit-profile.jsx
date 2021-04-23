@@ -16,7 +16,6 @@ function EditProfilePage({ user }) {
         <Formik
           initialValues={{}}
           onSubmit={async ({ avatar, ...rest }) => {
-            console.log(rest);
             if (avatar) {
               const bytes = await new Promise((res) => {
                 const reader = new FileReader();

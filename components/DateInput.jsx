@@ -16,20 +16,22 @@ function DateInput(props) {
   const [focusedInput, setFocusedInput] = useState();
 
   return (
-    <DateRangePicker
-      startDate={props.value.start ? moment(props.value.start) : null}
-      endDate={props.value.end ? moment(props.value.end) : null}
-      startDateId={props.id + "_start"}
-      endDateId={props.id + "_end"}
-      onDatesChange={({ startDate, endDate }) => {
-        props.onChange({
-          start: startDate ? momentToDate(startDate) : null,
-          end: endDate ? momentToDate(endDate) : null,
-        });
-      }}
-      focusedInput={focusedInput}
-      onFocusChange={(focusedInput) => setFocusedInput(focusedInput)}
-    />
+    <div>
+      <DateRangePicker
+        startDate={props.value.start ? moment(props.value.start) : null}
+        endDate={props.value.end ? moment(props.value.end) : null}
+        startDateId={props.id + "_start"}
+        endDateId={props.id + "_end"}
+        onDatesChange={({ startDate, endDate }) => {
+          props.onChange({
+            start: startDate ? momentToDate(startDate) : null,
+            end: endDate ? momentToDate(endDate) : null,
+          });
+        }}
+        focusedInput={focusedInput}
+        onFocusChange={(focusedInput) => setFocusedInput(focusedInput)}
+      />
+    </div>
   );
 }
 
