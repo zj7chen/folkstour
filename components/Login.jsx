@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
 import submit from "client/submit";
+import { GENDER } from "client/choices";
 
 function Login(props) {
   const [signingUp, setSigningUp] = useState(false);

@@ -94,8 +94,6 @@ function CreateTripForm(props) {
           </div>
 
           <label htmlFor="expense">Expense Estimate ($/day)</label>
-          {/* 是否该用 br 来 换行？*/}
-          <br></br>
           <Field id="expense" name="expense" placeholder="e.g. 300" />
 
           <label htmlFor="description">Description</label>
@@ -106,9 +104,6 @@ function CreateTripForm(props) {
             placeholder="Please state any further details about the trip here"
           />
 
-          {/* 是否该用 br 来 换行？*/}
-          <br></br>
-          <br></br>
           <button type="submit" disabled={isSubmitting}>
             Submit
           </button>
