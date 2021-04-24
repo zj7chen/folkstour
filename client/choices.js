@@ -24,6 +24,20 @@ export const TRANSPORTS = {
   },
 };
 
+export const GENDER_REQUIREMENTS = {
+  MALE: {
+    displayText: "Male only",
+  },
+  FEMALE: {
+    displayText: "Female only",
+  },
+  ANY: {
+    displayText: "Any",
+  },
+};
+
+export const GENDER_REQUIREMENT_DEFAULT = "ANY";
+
 export const GENDERS = {
   MALE: {
     displayText: "Male",
@@ -31,9 +45,4 @@ export const GENDERS = {
   FEMALE: {
     displayText: "Female",
   },
-  ANY: {
-    displayText: "Any",
-  },
 };
-
-export const GENDER_DEFAULT = "ANY";

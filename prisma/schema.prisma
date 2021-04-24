@@ -28,18 +28,18 @@ model TripTransport {
 }
 
 model Trip {
-  id                Int             @id @default(autoincrement())
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
   title             String
   tripBeginTime     DateTime
   tripEndTime       DateTime
   description       String
   teamSize          TeamSize
-  author            User            @relation(fields: [authorId], references: [id])
+  author            User              @relation(fields: [authorId], references: [id])
   authorId          String
   expectedExpense   Decimal
-  genderRequirement Gender
+  genderRequirement GenderRequirement
   reservations      Reservation[]
   locations         TripLocation[]
   transports        TripTransport[]
@@ -60,6 +60,11 @@ enum Transport {
 enum Gender {
   MALE
   FEMALE
+}
+
+enum GenderRequirement {
+  MALE
+  FEMALE
   ANY
 }
 
@@ -75,8 +80,10 @@ model Reservation {
 
 model User {
   id        String @id
+  name      String @default("")
   selfIntro String @default("")
   avatar    Bytes?
+  gender    Gender
 
   // TODO user experience rank system
   reservations Reservation[]

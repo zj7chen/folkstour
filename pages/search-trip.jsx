@@ -8,6 +8,7 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
+import { getSessionCookies } from "server/get_session_cookies";
 
 // { trip } in this case is actually {trip: trip} = props.trip
 function TripCard({ trip }) {
@@ -56,23 +57,26 @@ function SearchTripPage(props) {
 }
 
 // context stores query and other stuff
-export async function getServerSideProps(context) {
+export async function getServerSideProps({ req, query }) {
+  const decodedClaims = await getSessionCookies(req);
   // e.g. const { title: t } = context.query
   // 是取 context.query 中 key 为 title 的 property 并赋值到 变量 t 上
-  const {
-    title,
-    location,
-    dates,
-    teamsize,
-    transports,
-    expense,
-  } = context.query;
+  const { title, location, dates, teamsize, transports, expense } = query;
   let start, end;
   if (dates) {
     [start, end] = dates.split(",").map((d) => new Date(d + "T00:00:00.000Z"));
     start = new Date(start.getTime() - 30 * 24 * 60 * 60 * 1000);
     end = new Date(end.getTime() + 30 * 24 * 60 * 60 * 1000);
   }
+  console.log(decodedClaims);
+  const user = await prisma.user.findUnique({
+    select: {
+      gender: true,
+    },
+    where: {
+      id: decodedClaims.uid,
+    },
+  });
   const trips = await prisma.trip.findMany({
     orderBy: {
       updatedAt: "desc",
@@ -119,6 +123,18 @@ export async function getServerSideProps(context) {
       tripEndTime: {
         lte: end,
       },
+      OR: [
+        {
+          genderRequirement: {
+            equals: user.gender,
+          },
+        },
+        {
+          genderRequirement: {
+            equals: "ANY",
+          },
+        },
+      ],
       teamSize: {
         equals: teamsize !== "ANY" ? teamsize : undefined,
       },

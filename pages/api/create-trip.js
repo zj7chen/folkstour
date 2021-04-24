@@ -8,7 +8,7 @@ async function handler(req, res) {
     const decodedClaims = await admin
       .auth()
       .verifySessionCookie(sessionCookie, true);
-    await prisma.trip.create({
+    const trip = await prisma.trip.create({
       data: {
         locations: {
           create: req.body.locations.map((location, order) => ({
@@ -32,7 +32,7 @@ async function handler(req, res) {
         },
       },
     });
-    res.json({});
+    res.json({ id: trip.id });
     // .catch((error) => {
     //   console.log(error);
     //   res.status(400).json({ message: "Failed" });

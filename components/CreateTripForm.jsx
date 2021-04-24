@@ -1,7 +1,7 @@
 import countries from "cities.json";
 import {
-  GENDERS,
-  GENDER_DEFAULT,
+  GENDER_REQUIREMENTS,
+  GENDER_REQUIREMENT_DEFAULT,
   TEAM_SIZES,
   TEAM_SIZE_DEFAULT,
   TRANSPORTS,
@@ -14,11 +14,13 @@ import RouteMap from "components/RouteMap";
 import { Field, Formik } from "formik";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { useRouter } from "next/router";
 
 const FormikLocation = FormikAdaptor(LocationInput);
 const FormikDate = FormikAdaptor(DateInput);
 
 function CreateTripForm(props) {
+  const router = useRouter();
   return (
     <Formik
       initialValues={{
@@ -28,12 +30,13 @@ function CreateTripForm(props) {
         dates: { start: null, end: null },
         teamSize: TEAM_SIZE_DEFAULT,
         transports: [],
-        gender: GENDER_DEFAULT,
+        gender: GENDER_REQUIREMENT_DEFAULT,
         expense: "",
         description: "",
       }}
       onSubmit={async (values) => {
-        await submit("/api/create-trip", values);
+        const { id } = await submit("/api/create-trip", values);
+        router.push({ pathname: "trip", query: { id: id } });
       }}
     >
       {({
@@ -81,6 +84,7 @@ function CreateTripForm(props) {
             <div>
               {Object.entries(TEAM_SIZES).map(([key, { displayText }]) => (
                 <Form.Check
+                  key={key}
                   id={`teamSize-${key}`}
                   inline
                   type="radio"
@@ -98,6 +102,7 @@ function CreateTripForm(props) {
             <div>
               {Object.entries(TRANSPORTS).map(([key, { displayText }]) => (
                 <Form.Check
+                  key={key}
                   id={`transports-${key}`}
                   inline
                   type="checkbox"
@@ -113,17 +118,20 @@ function CreateTripForm(props) {
           <Form.Group controlId="gender">
             <Form.Label>Gender</Form.Label>
             <div>
-              {Object.entries(GENDERS).map(([key, { displayText }]) => (
-                <Form.Check
-                  id={`gender-${key}`}
-                  inline
-                  type="radio"
-                  label={displayText}
-                  name="gender"
-                  value={key}
-                  onChange={handleChange}
-                />
-              ))}
+              {Object.entries(GENDER_REQUIREMENTS).map(
+                ([key, { displayText }]) => (
+                  <Form.Check
+                    key={key}
+                    id={`gender-${key}`}
+                    inline
+                    type="radio"
+                    label={displayText}
+                    name="gender"
+                    value={key}
+                    onChange={handleChange}
+                  />
+                )
+              )}
             </div>
           </Form.Group>
 

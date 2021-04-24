@@ -3,7 +3,7 @@ import prisma from "server/prisma";
 
 function handler(req, res) {
   if (req.method === "POST") {
-    const { email, password } = req.body;
+    const { email, password, name, gender } = req.body;
     return admin
       .auth()
       .createUser({ email, password })
@@ -12,6 +12,8 @@ function handler(req, res) {
           .create({
             data: {
               id: userRecord.uid,
+              name,
+              gender,
             },
           })
           .then(() => {

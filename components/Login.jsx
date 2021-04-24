@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
 import submit from "client/submit";
-import { GENDER } from "client/choices";
+import { GENDERS } from "client/choices";
 import { Formik } from "formik";
 
 function Login({ onHide }) {
@@ -20,18 +20,22 @@ function Login({ onHide }) {
     <>
       {/* Login / Signup Popup */}
       {/* *************** TODO: Add gender of user when registering *************** */}
-      <Modal show={!showConfirm} centered onHide={onHide}>
+      <Modal show centered onHide={onHide}>
         <Formik
           initialValues={{
             email: "",
             password: "",
             confirmPass: "",
+            name: "",
+            gender: "",
             signingUp: false,
           }}
-          onSubmit={async ({ signingUp, email, password }) => {
+          onSubmit={async ({ signingUp, email, password, name, gender }) => {
             await submit(signingUp ? "/api/signup" : "/api/login", {
               email,
               password,
+              name,
+              gender,
             });
             // if onHide is undefined, the expression will return undefined, else call function
             onHide?.();
@@ -75,7 +79,7 @@ function Login({ onHide }) {
                 </Form.Group>
 
                 {values.signingUp && (
-                  <Form.Group controlId="confirm">
+                  <Form.Group controlId="confirmPass">
                     <Form.Label>Confirm Password</Form.Label>
                     <Form.Control
                       value={values.confirmPass}
@@ -86,6 +90,41 @@ function Login({ onHide }) {
                   </Form.Group>
                 )}
 
+                {values.signingUp && (
+                  <Form.Group controlId="name">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control
+                      value={values.name}
+                      onChange={handleChange}
+                      type="text"
+                      placeholder="What would you like to be called?"
+                    />
+                  </Form.Group>
+                )}
+
+                {values.signingUp && (
+                  <Form.Group controlId="gender">
+                    <Form.Label>Gender</Form.Label>
+                    <div>
+                      {Object.entries(GENDERS).map(([key, { displayText }]) => (
+                        <Form.Check
+                          key={key}
+                          id={`gender-${key}`}
+                          inline
+                          type="radio"
+                          label={displayText}
+                          name="gender"
+                          value={key}
+                          onChange={handleChange}
+                        />
+                      ))}
+                    </div>
+                    <Form.Text className="text-muted">
+                      Gender will affect you when trips have gender requirements
+                    </Form.Text>
+                  </Form.Group>
+                )}
+
                 {errors.mismatch && (
                   <Alert variant="danger">{errors.mismatch}</Alert>
                 )}
@@ -93,6 +132,15 @@ function Login({ onHide }) {
                 {!values.signingUp && (
                   <Form.Group controlId="remember">
                     <Form.Check type="checkbox" label="Remember me" />
+                  </Form.Group>
+                )}
+
+                {values.signingUp && (
+                  <Form.Group controlId="agree">
+                    <Form.Check
+                      type="checkbox"
+                      label="Agree to terms and conditions"
+                    />
                   </Form.Group>
                 )}
               </Modal.Body>

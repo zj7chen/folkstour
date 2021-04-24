@@ -7,6 +7,7 @@ import submit from "client/submit";
 import admin from "server/server";
 import prisma from "server/prisma";
 import Avatar from "components/Avatar";
+import { getSessionCookies } from "server/get_session_cookies";
 
 function EditProfilePage({ user }) {
   return (
@@ -62,11 +63,7 @@ function EditProfilePage({ user }) {
 }
 
 export async function getServerSideProps({ req }) {
-  const sessionCookie = req.cookies.session || "";
-  // firebase-admin
-  const decodedClaims = await admin
-    .auth()
-    .verifySessionCookie(sessionCookie, true);
+  const decodedClaims = await getSessionCookies(req);
   const { selfIntro, avatar } = await prisma.user.findUnique({
     select: {
       selfIntro: true,
