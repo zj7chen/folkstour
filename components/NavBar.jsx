@@ -27,6 +27,8 @@ function NavBar(props) {
         <Button variant="primary" onClick={() => setShowLogin(true)}>
           Login
         </Button>
+
+        {/* TODO: Logout Button */}
       </Navbar.Collapse>
     </Navbar>
   );

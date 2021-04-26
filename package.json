@@ -12,11 +12,11 @@
   "author": "",
   "dependencies": {
     "@prisma/client": "^2.20.1",
+    "bcrypt": "^5.0.1",
     "bootstrap": "^4.6.0",
-    "firebase": "^8.2.10",
-    "firebase-admin": "^9.5.0",
     "formik": "^2.2.6",
     "fuse.js": "^6.4.6",
+    "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "next": "^10.0.7",
     "ol": "^6.5.0",
@@ -24,6 +24,7 @@
     "react-bootstrap": "^1.5.0",
     "react-dates": "^21.8.0",
     "react-dom": "^17.0.2",
+    "react-rte": "^0.16.3",
     "react-select": "^4.3.0"
   },
   "devDependencies": {

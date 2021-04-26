@@ -37,7 +37,7 @@ model Trip {
   description       String
   teamSize          TeamSize
   author            User              @relation(fields: [authorId], references: [id])
-  authorId          String
+  authorId          Int
   expectedExpense   Decimal
   genderRequirement GenderRequirement
   reservations      Reservation[]
@@ -69,17 +69,19 @@ enum GenderRequirement {
 }
 
 model Reservation {
-  id     Int    @id @default(autoincrement())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
   tripId Int
-  trip   Trip   @relation(fields: [tripId], references: [id])
+  trip   Trip @relation(fields: [tripId], references: [id])
 
   @@unique([tripId, userId])
 }
 
 model User {
-  id        String @id
+  id        Int    @id @default(autoincrement())
+  email     String
+  password  String
   name      String @default("")
   selfIntro String @default("")
   avatar    Bytes?

@@ -8,7 +8,7 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
-import { getSessionCookies } from "server/get_session_cookies";
+import { getSession } from "server/session";
 
 // { trip } in this case is actually {trip: trip} = props.trip
 function TripCard({ trip }) {
@@ -58,7 +58,7 @@ function SearchTripPage(props) {
 
 // context stores query and other stuff
 export async function getServerSideProps({ req, query }) {
-  const decodedClaims = await getSessionCookies(req);
+  const { userId } = await getSession(req);
   // e.g. const { title: t } = context.query
   // 是取 context.query 中 key 为 title 的 property 并赋值到 变量 t 上
   const { title, location, dates, teamsize, transports, expense } = query;
@@ -68,13 +68,12 @@ export async function getServerSideProps({ req, query }) {
     start = new Date(start.getTime() - 30 * 24 * 60 * 60 * 1000);
     end = new Date(end.getTime() + 30 * 24 * 60 * 60 * 1000);
   }
-  console.log(decodedClaims);
   const user = await prisma.user.findUnique({
     select: {
       gender: true,
     },
     where: {
-      id: decodedClaims.uid,
+      id: userId,
     },
   });
   const trips = await prisma.trip.findMany({

@@ -1,30 +1,31 @@
-import admin from "server/server";
+import bcrypt from "bcrypt";
 import prisma from "server/prisma";
+import { setSession } from "server/session";
 
-function handler(req, res) {
+async function handler(req, res) {
   if (req.method === "POST") {
     const { email, password, name, gender } = req.body;
-    return admin
-      .auth()
-      .createUser({ email, password })
-      .then((userRecord) => {
-        return prisma.user
-          .create({
-            data: {
-              id: userRecord.uid,
-              name,
-              gender,
-            },
-          })
-          .then(() => {
-            console.log("Successfully created new user:", userRecord.uid);
-            res.status(200).json({});
-          });
-      })
-      .catch((error) => {
-        console.log("Error creating new user:", error);
-        res.status(404).json({ message: error.message });
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(password, salt);
+    let user;
+    try {
+      user = await prisma.user.create({
+        data: {
+          email,
+          password: hash,
+          name,
+          gender,
+        },
       });
+    } catch (error) {
+      console.log("Error creating new user:", error);
+      res.status(404).json({ message: error.message });
+      return;
+    }
+    console.log("Successfully created new user:", user.id);
+    setSession(res, user.id);
+    res.json({});
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }

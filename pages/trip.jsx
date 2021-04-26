@@ -12,16 +12,16 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
-import admin from "server/server";
+import { getSession } from "server/session";
 
 function TripPage({ trip }) {
+  const router = useRouter();
+
   function isAuthor(reservation) {
     return reservation.user.id === trip.authorId;
   }
 
   const author = trip.reservations.find(isAuthor).user;
-  console.log(trip.reserved);
-  const router = useRouter();
   return (
     <div>
       <NavBar />
@@ -77,20 +77,20 @@ function TripPage({ trip }) {
             <Link href={`/profile?id=${author.id}`}>
               <a>
                 <Avatar content={author.avatar} />
-                <span>{author.id}</span>
+                <span>{author.name}</span>
               </a>
             </Link>
             <h2>Other Participants</h2>
             <ul>
               {trip.reservations
                 .filter((r) => !isAuthor(r))
-                .map(({ user: { id, avatar } }) => {
+                .map(({ user: { id, name, avatar } }) => {
                   return (
                     <li key={id}>
                       <Link href={`/profile?id=${id}`}>
                         <a>
                           <Avatar content={avatar} />
-                          <span>{id}</span>
+                          <span>{name}</span>
                         </a>
                       </Link>
                     </li>
@@ -105,11 +105,7 @@ function TripPage({ trip }) {
 }
 
 export async function getServerSideProps({ req, query }) {
-  const sessionCookie = req.cookies.session || "";
-  // firebase-admin
-  const decodedClaims = await admin
-    .auth()
-    .verifySessionCookie(sessionCookie, true);
+  const { userId } = getSession(req);
   let { id } = query;
   id = parseInt(id);
   const {
@@ -149,6 +145,7 @@ export async function getServerSideProps({ req, query }) {
           user: {
             select: {
               id: true,
+              name: true,
               avatar: true,
             },
           },
@@ -170,10 +167,10 @@ export async function getServerSideProps({ req, query }) {
         // {city, province, country}[]
         locations: locations.map(({ location }) => location),
         expectedExpense: expectedExpense.toJSON(),
-        reservations: reservations.map(({ user: { id, avatar } }) => ({
-          user: { id, avatar: avatar?.toString("base64") ?? null },
+        reservations: reservations.map(({ user: { avatar, ...rest } }) => ({
+          user: { ...rest, avatar: avatar?.toString("base64") ?? null },
         })),
-        reserved: reservations.some((r) => r.user.id === decodedClaims.uid),
+        reserved: reservations.some((r) => r.user.id === userId),
       },
     },
   };

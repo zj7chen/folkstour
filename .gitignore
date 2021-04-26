@@ -3,3 +3,7 @@ firebase-adminsdk.json
 .next/
 .env.local
 cities.json
+
+# jwt key pair
+/public.pem
+/private.key

@@ -1,6 +1,6 @@
+import Avatar from "components/Avatar";
 import NavBar from "components/NavBar";
 import Container from "react-bootstrap/Container";
-import Avatar from "components/Avatar";
 import prisma from "server/prisma";
 
 function ProfilePage({ user }) {
@@ -10,7 +10,7 @@ function ProfilePage({ user }) {
       <Container fluid="xl">
         <section>
           <Avatar content={user.avatar} />
-          <span>{user.id}</span>
+          <span>{user.name}</span>
         </section>
         <section>
           <h2>Trips Parcitipating</h2>
@@ -31,9 +31,11 @@ function ProfilePage({ user }) {
 
 export async function getServerSideProps({ query }) {
   let { id } = query;
+  id = parseInt(id);
   const { avatar, trips, reservations, ...rest } = await prisma.user.findUnique(
     {
       select: {
+        name: true,
         avatar: true,
         reservations: {
           orderBy: {
@@ -72,7 +74,7 @@ export async function getServerSideProps({ query }) {
       user: {
         ...rest,
         id,
-        avatar: avatar?.toString("base64"),
+        avatar: avatar?.toString("base64") ?? null,
         reservations: reservations.map(
           ({ trip: { reservations, ...rest } }) => ({
             trip: {

@@ -1,13 +1,9 @@
 import prisma from "server/prisma";
-import admin from "server/server";
+import { getSession } from "server/session";
 
 async function handler(req, res) {
   if (req.method === "POST") {
-    const sessionCookie = req.cookies.session || "";
-    // firebase-admin
-    const decodedClaims = await admin
-      .auth()
-      .verifySessionCookie(sessionCookie, true);
+    const { userId } = getSession(req);
     const trip = await prisma.trip.create({
       data: {
         locations: {
@@ -26,9 +22,9 @@ async function handler(req, res) {
         teamSize: req.body.teamSize,
         expectedExpense: req.body.expense,
         genderRequirement: req.body.gender,
-        author: { connect: { id: decodedClaims.uid } },
+        author: { connect: { id: userId } },
         reservations: {
-          create: { userId: decodedClaims.uid },
+          create: { userId },
         },
       },
     });

@@ -1,17 +1,13 @@
 import prisma from "server/prisma";
-import admin from "server/server";
+import { getSession } from "server/session";
 
 async function handler(req, res) {
   if (req.method === "POST") {
-    const sessionCookie = req.cookies.session || "";
-    // firebase-admin
-    const decodedClaims = await admin
-      .auth()
-      .verifySessionCookie(sessionCookie, true);
+    const { userId } = getSession(req);
     if (req.body.reserve) {
       await prisma.reservation.create({
         data: {
-          userId: decodedClaims.uid,
+          userId,
           tripId: req.body.tripId,
         },
       });
@@ -19,7 +15,7 @@ async function handler(req, res) {
       await prisma.reservation.delete({
         where: {
           tripId_userId: {
-            userId: decodedClaims.uid,
+            userId,
             tripId: req.body.tripId,
           },
         },
