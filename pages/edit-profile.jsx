@@ -8,36 +8,51 @@ import Form from "react-bootstrap/Form";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
 import dynamic from "next/dynamic";
+import { useRef } from "react";
+import Cropper from "react-cropper";
 
 const MarkdownEditor = dynamic(() => import("components/MarkdownEditor"), {
   ssr: false,
 });
 
 function EditProfilePage({ user }) {
+  const cropperRef = useRef(null);
   return (
     <div>
       <NavBar />
       <Container fluid="xl">
         <Formik
           initialValues={user}
-          onSubmit={async (value) => {
-            await submit("/api/update-profile", value);
+          onSubmit={async ({ selfIntro }) => {
+            const cropper = cropperRef.current.cropper;
+            const avatar = cropper
+              .getCroppedCanvas()
+              .toDataURL()
+              .split(";base64,")[1];
+            await submit("/api/update-profile", { avatar, selfIntro });
           }}
         >
           {({ values, handleSubmit, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               <Form.Group>
-                <Avatar content={values.avatar} />
+                <Cropper
+                  // Cropper.js options
+                  initialAspectRatio={1 / 1}
+                  guides={false}
+                  ref={cropperRef}
+                />
                 <Form.File
                   id="avatar"
                   name="avatar"
                   label="Select file"
                   onChange={async (e) => {
                     const { name, files } = e.currentTarget;
+                    if (files.length === 0) return;
                     const reader = new FileReader();
-                    reader.readAsBinaryString(files[0]);
+                    reader.readAsDataURL(files[0]);
                     await new Promise((res) => (reader.onloadend = res));
-                    setFieldValue(name, btoa(reader.result));
+                    const cropper = cropperRef.current.cropper;
+                    cropper.replace(reader.result);
                   }}
                 />
               </Form.Group>
@@ -63,10 +78,9 @@ function EditProfilePage({ user }) {
 
 export async function getServerSideProps({ req }) {
   const { userId } = await getSession(req);
-  const { selfIntro, avatar } = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     select: {
       selfIntro: true,
-      avatar: true,
     },
     where: {
       id: userId,
@@ -74,10 +88,7 @@ export async function getServerSideProps({ req }) {
   });
   return {
     props: {
-      user: {
-        selfIntro,
-        avatar: avatar?.toString("base64") ?? null,
-      },
+      user,
     },
   };
 }

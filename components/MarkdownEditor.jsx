@@ -6,9 +6,7 @@ const toolbarConfig = {
   INLINE_STYLE_BUTTONS: [
     { label: "Bold", style: "BOLD" },
     { label: "Italic", style: "ITALIC" },
-    { label: "Strikethrough", style: "STRIKETHROUGH" },
     { label: "Monospace", style: "CODE" },
-    { label: "Underline", style: "UNDERLINE" },
   ],
   BLOCK_TYPE_BUTTONS: [
     { label: "UL", style: "unordered-list-item" },

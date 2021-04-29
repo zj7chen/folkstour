@@ -76,7 +76,7 @@ function TripPage({ trip }) {
             <h2>Founder</h2>
             <Link href={`/profile?id=${author.id}`}>
               <a>
-                <Avatar content={author.avatar} />
+                <Avatar id={author.id} />
                 <span>{author.name}</span>
               </a>
             </Link>
@@ -89,7 +89,7 @@ function TripPage({ trip }) {
                     <li key={id}>
                       <Link href={`/profile?id=${id}`}>
                         <a>
-                          <Avatar content={avatar} />
+                          <Avatar id={id} />
                           <span>{name}</span>
                         </a>
                       </Link>

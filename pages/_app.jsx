@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import Head from "next/head";
+import "node_modules/cropperjs/dist/cropper.css";
 
 export default function MyApp({ Component, pageProps }) {
   return (

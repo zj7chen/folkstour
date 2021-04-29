@@ -2,6 +2,7 @@ import Avatar from "components/Avatar";
 import NavBar from "components/NavBar";
 import Container from "react-bootstrap/Container";
 import prisma from "server/prisma";
+import ReactMarkdown from "react-markdown";
 
 function ProfilePage({ user }) {
   return (
@@ -9,7 +10,7 @@ function ProfilePage({ user }) {
       <NavBar />
       <Container fluid="xl">
         <section>
-          <Avatar content={user.avatar} />
+          <Avatar id={user.id} />
           <span>{user.name}</span>
         </section>
         <section>
@@ -17,13 +18,28 @@ function ProfilePage({ user }) {
           {user.reservations.map(({ trip: { id, title, reservations } }) => (
             <section key={id}>
               <h3>{title}</h3>
-              {reservations.map(({ user: { id, avatar } }) => (
-                <Avatar key={id} content={avatar} />
+              {reservations.map(({ user: { id } }) => (
+                <Avatar key={id} id={id} />
               ))}
             </section>
           ))}
         </section>
         <h2>Self Introduction</h2>
+        <ReactMarkdown
+          allowedElements={[
+            "strong",
+            "em",
+            "ul",
+            "ol",
+            "code",
+            "blockquote",
+            "li",
+            "p",
+          ]}
+          skipHtml
+        >
+          {user.selfIntro}
+        </ReactMarkdown>
       </Container>
     </div>
   );
@@ -32,29 +48,26 @@ function ProfilePage({ user }) {
 export async function getServerSideProps({ query }) {
   let { id } = query;
   id = parseInt(id);
-  const { avatar, trips, reservations, ...rest } = await prisma.user.findUnique(
-    {
-      select: {
-        name: true,
-        avatar: true,
-        reservations: {
-          orderBy: {
-            trip: {
-              title: "asc",
-            },
+  const user = await prisma.user.findUnique({
+    select: {
+      name: true,
+      selfIntro: true,
+      reservations: {
+        orderBy: {
+          trip: {
+            title: "asc",
           },
-          select: {
-            trip: {
-              select: {
-                id: true,
-                title: true,
-                reservations: {
-                  select: {
-                    user: {
-                      select: {
-                        id: true,
-                        avatar: true,
-                      },
+        },
+        select: {
+          trip: {
+            select: {
+              id: true,
+              title: true,
+              reservations: {
+                select: {
+                  user: {
+                    select: {
+                      id: true,
                     },
                   },
                 },
@@ -62,31 +75,18 @@ export async function getServerSideProps({ query }) {
             },
           },
         },
-        id: true,
       },
-      where: {
-        id,
-      },
-    }
-  );
+      id: true,
+    },
+    where: {
+      id,
+    },
+  });
   return {
     props: {
       user: {
-        ...rest,
+        ...user,
         id,
-        avatar: avatar?.toString("base64") ?? null,
-        reservations: reservations.map(
-          ({ trip: { reservations, ...rest } }) => ({
-            trip: {
-              ...rest,
-              reservations: reservations.map(
-                ({ user: { avatar, ...rest } }) => ({
-                  user: { ...rest, avatar: avatar?.toString("base64") ?? null },
-                })
-              ),
-            },
-          })
-        ),
       },
     },
   };

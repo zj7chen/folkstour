@@ -1,11 +1,12 @@
 import prisma from "server/prisma";
 import { setSession } from "server/session";
+import bcrypt from "bcrypt";
 
 async function handler(req, res) {
   if (req.method === "POST") {
     const { email, password } = req.body;
     // When the user signs in with email and password.
-    const user = prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       select: {
         id: true,
         password: true,

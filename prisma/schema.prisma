@@ -90,4 +90,6 @@ model User {
   // TODO user experience rank system
   reservations Reservation[]
   trips        Trip[]
+
+  @@unique([email])
 }
