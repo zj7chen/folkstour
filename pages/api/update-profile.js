@@ -5,6 +5,7 @@ import { getSession } from "server/session";
 async function handler(req, res) {
   if (req.method === "POST") {
     const { userId } = getSession(req);
+    const { gender, selfIntro } = req.body;
     const avatar = req.body.avatar
       ? Buffer.from(req.body.avatar, "base64")
       : undefined;
@@ -13,7 +14,8 @@ async function handler(req, res) {
         id: userId,
       },
       data: {
-        selfIntro: req.body.selfIntro,
+        gender,
+        selfIntro,
         avatar,
       },
     });

@@ -8,7 +8,7 @@ function NavBar(props) {
   const [showLogin, setShowLogin] = useState(false);
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="light" expand="md" sticky="top" style={{ minHeight: "3.5rem" }}>
       <Navbar.Brand href="#home">TripMate</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">

@@ -10,6 +10,7 @@ import { getSession } from "server/session";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
 import Cropper from "react-cropper";
+import { GENDERS } from "client/choices";
 
 const MarkdownEditor = dynamic(() => import("components/MarkdownEditor"), {
   ssr: false,
@@ -23,16 +24,16 @@ function EditProfilePage({ user }) {
       <Container fluid="xl">
         <Formik
           initialValues={user}
-          onSubmit={async ({ selfIntro }) => {
+          onSubmit={async (values) => {
             const cropper = cropperRef.current.cropper;
             const avatar = cropper
               .getCroppedCanvas()
-              .toDataURL()
-              .split(";base64,")[1];
-            await submit("/api/update-profile", { avatar, selfIntro });
+              ?.toDataURL()
+              ?.split(";base64,")?.[1];
+            await submit("/api/update-profile", { ...values, avatar });
           }}
         >
-          {({ values, handleSubmit, setFieldValue }) => (
+          {({ values, handleChange, handleSubmit, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Cropper
@@ -44,7 +45,7 @@ function EditProfilePage({ user }) {
                 <Form.File
                   id="avatar"
                   name="avatar"
-                  label="Select file"
+                  label="Avatar"
                   onChange={async (e) => {
                     const { name, files } = e.currentTarget;
                     if (files.length === 0) return;
@@ -55,6 +56,27 @@ function EditProfilePage({ user }) {
                     cropper.replace(reader.result);
                   }}
                 />
+              </Form.Group>
+              <Form.Group controlId="gender">
+                <Form.Label>Gender</Form.Label>
+                <div>
+                  {Object.entries(GENDERS).map(([key, { displayText }]) => (
+                    <Form.Check
+                      key={key}
+                      id={`gender-${key}`}
+                      inline
+                      type="radio"
+                      label={displayText}
+                      name="gender"
+                      value={key}
+                      onChange={handleChange}
+                      checked={values.gender === key}
+                    />
+                  ))}
+                </div>
+                <Form.Text className="text-muted">
+                  Gender will affect you when trips have gender requirements
+                </Form.Text>
               </Form.Group>
               <Form.Group controlId="selfIntro">
                 <Form.Label>Self Intro</Form.Label>
@@ -80,6 +102,7 @@ export async function getServerSideProps({ req }) {
   const { userId } = await getSession(req);
   const user = await prisma.user.findUnique({
     select: {
+      gender: true,
       selfIntro: true,
     },
     where: {

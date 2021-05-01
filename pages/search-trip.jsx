@@ -1,6 +1,7 @@
 import { displayLocation } from "client/display";
 import NavBar from "components/NavBar";
 import SearchTripForm from "components/SearchTripForm";
+import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
@@ -38,21 +39,12 @@ function TripCard({ trip }) {
 
 function SearchTripPage(props) {
   return (
-    <div>
-      <NavBar />
-      <Container fluid="xl">
-        <Row>
-          <Col lg={4}>
-            <SearchTripForm />
-          </Col>
-          <Col lg={8}>
-            {props.trips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
-            ))}
-          </Col>
-        </Row>
-      </Container>
-    </div>
+    <StickyLayout
+      left={<SearchTripForm />}
+      right={props.trips.map((trip) => (
+        <TripCard key={trip.id} trip={trip} />
+      ))}
+    />
   );
 }
 

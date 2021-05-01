@@ -115,6 +115,7 @@ function Login({ onHide }) {
                         name="gender"
                         value={key}
                         onChange={handleChange}
+                        checked={values.gender === key}
                       />
                     ))}
                   </div>

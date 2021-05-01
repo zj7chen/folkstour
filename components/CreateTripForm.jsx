@@ -92,6 +92,7 @@ function CreateTripForm(props) {
                   name="teamSize"
                   value={key}
                   onChange={handleChange}
+                  checked={values.teamSize === key}
                 />
               ))}
             </div>
@@ -110,6 +111,7 @@ function CreateTripForm(props) {
                   name="transports"
                   value={key}
                   onChange={handleChange}
+                  checked={values.transports.indexOf(key) !== -1}
                 />
               ))}
             </div>
@@ -129,6 +131,7 @@ function CreateTripForm(props) {
                     name="gender"
                     value={key}
                     onChange={handleChange}
+                    checked={values.gender === key}
                   />
                 )
               )}
