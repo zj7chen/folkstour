@@ -23,10 +23,6 @@ async function handler(req, res) {
     }
 
     res.json({});
-    // .catch((error) => {
-    //   console.log(error);
-    //   res.status(400).json({ message: "Failed" });
-    // });
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }

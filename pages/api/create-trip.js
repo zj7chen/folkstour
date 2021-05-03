@@ -7,7 +7,7 @@ async function handler(req, res) {
     const trip = await prisma.trip.create({
       data: {
         locations: {
-          create: req.body.locations.map((location, order) => ({
+          createMany: req.body.locations.map((location, order) => ({
             location,
             order,
           })),
@@ -29,10 +29,6 @@ async function handler(req, res) {
       },
     });
     res.json({ id: trip.id });
-    // .catch((error) => {
-    //   console.log(error);
-    //   res.status(400).json({ message: "Failed" });
-    // });
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }

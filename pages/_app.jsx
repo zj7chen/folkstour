@@ -1,4 +1,4 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+import "styles/bootstrap.scss";
 import Head from "next/head";
 import "node_modules/cropperjs/dist/cropper.css";
 

@@ -1,0 +1,26 @@
+.userProfile > img {
+  display: block;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  width: 12rem;
+}
+
+.userIdentity > h1 {
+  display: inline;
+  margin-right: 0.5rem;
+}
+
+.userIdentity > svg {
+  vertical-align: text-bottom;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.male > svg {
+  fill: #007bff;
+}
+
+.female > svg {
+  fill: #e83e8c;
+}

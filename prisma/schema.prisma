@@ -79,17 +79,25 @@ model Reservation {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  email     String
-  password  String
-  name      String @default("")
-  selfIntro String @default("")
-  avatar    Bytes?
-  gender    Gender
+  id         Int     @id @default(autoincrement())
+  email      String
+  password   String
+  name       String  @default("")
+  selfIntro  String  @default("")
+  avatarHash String?
+  avatar     Image?  @relation(fields: [avatarHash], references: [hash])
+
+  gender Gender
 
   // TODO user experience rank system
   reservations Reservation[]
   trips        Trip[]
 
   @@unique([email])
+}
+
+model Image {
+  hash        String @id
+  content     Bytes
+  avatarUsers User[]
 }

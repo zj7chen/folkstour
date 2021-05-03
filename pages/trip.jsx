@@ -76,7 +76,7 @@ function TripPage({ trip }) {
             <h2>Founder</h2>
             <Link href={`/profile?id=${author.id}`}>
               <a>
-                <Avatar id={author.id} />
+                <Avatar hash={author.avatarHash} />
                 <span>{author.name}</span>
               </a>
             </Link>
@@ -84,12 +84,12 @@ function TripPage({ trip }) {
             <ul>
               {trip.reservations
                 .filter((r) => !isAuthor(r))
-                .map(({ user: { id, name, avatar } }) => {
+                .map(({ user: { id, name, avatarHash } }) => {
                   return (
                     <li key={id}>
                       <Link href={`/profile?id=${id}`}>
                         <a>
-                          <Avatar id={id} />
+                          <Avatar hash={avatarHash} />
                           <span>{name}</span>
                         </a>
                       </Link>
@@ -146,7 +146,7 @@ export async function getServerSideProps({ req, query }) {
             select: {
               id: true,
               name: true,
-              avatar: true,
+              avatarHash: true,
             },
           },
         },
@@ -167,9 +167,7 @@ export async function getServerSideProps({ req, query }) {
         // {city, province, country}[]
         locations: locations.map(({ location }) => location),
         expectedExpense: expectedExpense.toJSON(),
-        reservations: reservations.map(({ user: { avatar, ...rest } }) => ({
-          user: { ...rest, avatar: avatar?.toString("base64") ?? null },
-        })),
+        reservations,
         reserved: reservations.some((r) => r.user.id === userId),
       },
     },

@@ -1,13 +1,15 @@
 import { displayLocation } from "client/display";
 import Avatar from "components/Avatar";
+import Female from "components/icons/Female";
+import Male from "components/icons/Male";
 import StickyLayout from "components/StickyLayout";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
 import ReactMarkdown from "react-markdown";
 import prisma from "server/prisma";
+import styles from "./profile.module.css";
 
 function TripCard({ trip }) {
-  console.log(trip.locations);
   return (
     <Card>
       <Card.Header>
@@ -23,8 +25,8 @@ function TripCard({ trip }) {
         <div>
           Trip Time: {trip.tripBeginTime}, {trip.tripEndTime},
         </div>
-        {trip.reservations.map(({ user: { id } }) => (
-          <Avatar key={id} id={id} />
+        {trip.reservations.map(({ user: { id, avatarHash } }) => (
+          <Avatar key={id} hash={avatarHash} />
         ))}
       </Card.Body>
     </Card>
@@ -32,14 +34,18 @@ function TripCard({ trip }) {
 }
 
 function ProfilePage({ user }) {
+  const Gender = { MALE: Male, FEMALE: Female }[user.gender];
+  const genderClass = { MALE: styles.male, FEMALE: styles.female }[user.gender];
   return (
     <StickyLayout
       left={
-        <>
-          <Avatar id={user.id} />
-          <span>{user.name}</span>
-          <span>{user.gender}</span>
-        </>
+        <div className={styles.userProfile}>
+          <Avatar hash={user.avatarHash} />
+          <div className={`${styles.userIdentity} ${genderClass}`}>
+            <h1>{user.name}</h1>
+            <Gender />
+          </div>
+        </div>
       }
       right={
         <>
@@ -80,6 +86,7 @@ export async function getServerSideProps({ query }) {
   const { reservations, ...rest } = await prisma.user.findUnique({
     select: {
       name: true,
+      avatarHash: true,
       selfIntro: true,
       gender: true,
       reservations: {
@@ -108,6 +115,7 @@ export async function getServerSideProps({ query }) {
                   user: {
                     select: {
                       id: true,
+                      avatarHash: true,
                     },
                   },
                 },

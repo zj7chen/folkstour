@@ -16,7 +16,6 @@ async function handler(req, res) {
       },
     });
     if (!(await bcrypt.compare(password, user.password))) {
-      console.log(error);
       res.status(401).send({ message: "Unauthorized" });
       return;
     }
