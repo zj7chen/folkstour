@@ -86,6 +86,9 @@ function EditProfilePage({ user }) {
                     setFieldValue("selfIntro", value);
                   }}
                 />
+                <Form.Text className="text-muted">
+                  Maximum of 4000 characters
+                </Form.Text>
               </Form.Group>
               <Button variant="primary" type="submit">
                 Save

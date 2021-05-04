@@ -1,0 +1,23 @@
+.card-body > p:last-child {
+  margin-bottom: 0;
+}
+
+.horizontal-image-group {
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.horizontal-image-group > * {
+  display: block;
+}
+
+.horizontal-image-group > *:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+.horizontal-image-group img {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  width: 2rem;
+}

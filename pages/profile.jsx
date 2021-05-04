@@ -1,37 +1,14 @@
-import { displayLocation } from "client/display";
+import { displayDate } from "client/display";
 import Avatar from "components/Avatar";
 import Female from "components/icons/Female";
 import Male from "components/icons/Male";
+import LocationOverview from "components/LocationOverview";
 import StickyLayout from "components/StickyLayout";
-import Link from "next/link";
+import TripCard from "components/TripCard";
 import Card from "react-bootstrap/Card";
 import ReactMarkdown from "react-markdown";
 import prisma from "server/prisma";
 import styles from "./profile.module.css";
-
-function TripCard({ trip }) {
-  return (
-    <Card>
-      <Card.Header>
-        <Link href={`/trip?id=${trip.id}`}>
-          <a>{trip.title}</a>
-        </Link>
-      </Card.Header>
-      <Card.Body>
-        <div>
-          {displayLocation(trip.startLocation)},{" "}
-          {displayLocation(trip.endLocation)}
-        </div>
-        <div>
-          Trip Time: {trip.tripBeginTime}, {trip.tripEndTime},
-        </div>
-        {trip.reservations.map(({ user: { id, avatarHash } }) => (
-          <Avatar key={id} hash={avatarHash} />
-        ))}
-      </Card.Body>
-    </Card>
-  );
-}
 
 function ProfilePage({ user }) {
   const Gender = { MALE: Male, FEMALE: Female }[user.gender];
@@ -48,33 +25,54 @@ function ProfilePage({ user }) {
         </div>
       }
       right={
-        <>
+        <div className={styles.userContent}>
           <section>
-            <h2>Self Introduction</h2>
-            <ReactMarkdown
-              allowedElements={[
-                "strong",
-                "em",
-                "ul",
-                "ol",
-                "code",
-                "blockquote",
-                "li",
-                "p",
-              ]}
-              skipHtml
-            >
-              {user.selfIntro}
-            </ReactMarkdown>
+            <h2>Intro</h2>
+            <Card body>
+              <ReactMarkdown
+                allowedElements={[
+                  "strong",
+                  "em",
+                  "ul",
+                  "ol",
+                  "code",
+                  "blockquote",
+                  "li",
+                  "p",
+                ]}
+                skipHtml
+              >
+                {user.selfIntro}
+              </ReactMarkdown>
+            </Card>
           </section>
 
           <section>
             <h2>Participating Trips</h2>
             {user.reservations.map(({ trip }) => (
-              <TripCard key={trip.id} trip={trip} />
+              <TripCard key={trip.id} trip={trip}>
+                <LocationOverview
+                  start={trip.startLocation}
+                  end={trip.endLocation}
+                  length={trip.numLocations}
+                />
+                <div className="d-flex justify-content-between mb-2">
+                  <div>
+                    Start date: {displayDate(new Date(trip.tripBeginTime))}
+                  </div>
+                  <div>End date: {displayDate(new Date(trip.tripEndTime))}</div>
+                </div>
+                <ul className="horizontal-image-group">
+                  {trip.reservations.map(({ user: { id, avatarHash } }) => (
+                    <li key={id}>
+                      <Avatar hash={avatarHash} />
+                    </li>
+                  ))}
+                </ul>
+              </TripCard>
             ))}
           </section>
-        </>
+        </div>
       }
     />
   );
@@ -111,6 +109,11 @@ export async function getServerSideProps({ query }) {
                 },
               },
               reservations: {
+                orderBy: {
+                  user: {
+                    name: "asc",
+                  },
+                },
                 select: {
                   user: {
                     select: {

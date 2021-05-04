@@ -24,3 +24,11 @@
 .female > svg {
   fill: #e83e8c;
 }
+
+.userContent > section {
+  margin-bottom: 2rem;
+}
+
+.userContent > section > h2 {
+  font-size: 1rem;
+}

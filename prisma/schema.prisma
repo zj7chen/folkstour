@@ -34,7 +34,7 @@ model Trip {
   title             String
   tripBeginTime     DateTime
   tripEndTime       DateTime
-  description       String
+  description       String            @db.VarChar(4000)
   teamSize          TeamSize
   author            User              @relation(fields: [authorId], references: [id])
   authorId          Int
@@ -83,7 +83,7 @@ model User {
   email      String
   password   String
   name       String  @default("")
-  selfIntro  String  @default("")
+  selfIntro  String  @default("") @db.VarChar(4000)
   avatarHash String?
   avatar     Image?  @relation(fields: [avatarHash], references: [hash])
 

@@ -1,48 +1,30 @@
 import { displayLocation } from "client/display";
-import NavBar from "components/NavBar";
 import SearchTripForm from "components/SearchTripForm";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
-import Link from "next/link";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
+import TripCard from "components/TripCard";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
-
-// { trip } in this case is actually {trip: trip} = props.trip
-function TripCard({ trip }) {
-  return (
-    <Card>
-      <Card.Header>{trip.title}</Card.Header>
-      <Card.Body>
-        <div>
-          {displayLocation(trip.locations[0])},{" "}
-          {displayLocation(trip.locations[trip.locations.length - 1])}
-        </div>
-        <div>
-          Trip Time: {trip.tripBeginTime}, {trip.tripEndTime},
-        </div>
-        <TripCapacity
-          teamSize={trip.teamSize}
-          reservations={trip.reservations}
-        />
-        <div>Transport: {trip.transports.join(" ")}</div>
-        <Link href={`/trip?id=${trip.id}`}>
-          <a>Details</a>
-        </Link>
-      </Card.Body>
-    </Card>
-  );
-}
 
 function SearchTripPage(props) {
   return (
     <StickyLayout
       left={<SearchTripForm />}
       right={props.trips.map((trip) => (
-        <TripCard key={trip.id} trip={trip} />
+        <TripCard key={trip.id} trip={trip}>
+          <div>
+            {displayLocation(trip.locations[0])},{" "}
+            {displayLocation(trip.locations[trip.locations.length - 1])}
+          </div>
+          <div>
+            Trip Time: {trip.tripBeginTime}, {trip.tripEndTime},
+          </div>
+          <TripCapacity
+            teamSize={trip.teamSize}
+            reservations={trip.reservations}
+          />
+          <div>Transport: {trip.transports.join(" ")}</div>
+        </TripCard>
       ))}
     />
   );

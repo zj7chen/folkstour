@@ -1,0 +1,22 @@
+@media (min-width: 992px) {
+  .root {
+    display: flex;
+  }
+
+  .separator {
+    flex-grow: 1;
+    align-self: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .elided {
+    margin: 0 1rem;
+  }
+}
+
+.elided {
+  color: #6c757d;
+  font-size: 80%;
+}
