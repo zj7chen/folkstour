@@ -21,3 +21,19 @@
   border-radius: 0.25rem;
   width: 2rem;
 }
+
+.vertical-user-group {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+.vertical-user-group img {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  width: 4rem;
+}
+
+.vertical-user-group > * {
+  display: block;
+}

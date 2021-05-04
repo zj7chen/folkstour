@@ -1,0 +1,12 @@
+.authorProfile > img {
+  display: block;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  width: 8rem;
+}
+
+.authorIdentity > h1 {
+  display: inline;
+  margin-right: 0.5rem;
+}

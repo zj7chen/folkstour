@@ -13,6 +13,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
+import styles from "./trip.module.css";
 
 function TripPage({ trip }) {
   const router = useRouter();
@@ -76,12 +77,16 @@ function TripPage({ trip }) {
             <h2>Founder</h2>
             <Link href={`/profile?id=${author.id}`}>
               <a>
-                <Avatar hash={author.avatarHash} />
-                <span>{author.name}</span>
+                <div className={styles.authorProfile}>
+                  <Avatar hash={author.avatarHash} />
+                  <div className={styles.authorIdentity}>
+                    <h2>{author.name}</h2>
+                  </div>
+                </div>
               </a>
             </Link>
             <h2>Other Participants</h2>
-            <ul>
+            <ul className="vertical-user-group">
               {trip.reservations
                 .filter((r) => !isAuthor(r))
                 .map(({ user: { id, name, avatarHash } }) => {
@@ -90,7 +95,7 @@ function TripPage({ trip }) {
                       <Link href={`/profile?id=${id}`}>
                         <a>
                           <Avatar hash={avatarHash} />
-                          <span>{name}</span>
+                          <h3>{name}</h3>
                         </a>
                       </Link>
                     </li>
