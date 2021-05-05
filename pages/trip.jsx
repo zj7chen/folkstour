@@ -14,6 +14,7 @@ import Row from "react-bootstrap/Row";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
 import styles from "./trip.module.css";
+import { displayDate } from "client/display";
 
 function TripPage({ trip }) {
   const router = useRouter();
@@ -53,8 +54,8 @@ function TripPage({ trip }) {
               ))}
             </ul>
             <ul>
-              <li>Start date: {trip.tripBeginTime}</li>
-              <li>End date: {trip.tripEndTime}</li>
+              <li>Start date: {displayDate(new Date(trip.tripBeginTime))}</li>
+              <li>End date: {displayDate(new Date(trip.tripEndTime))}</li>
             </ul>
             <h2>Team Capacity</h2>
             <TripCapacity
@@ -74,34 +75,40 @@ function TripPage({ trip }) {
             />
           </Col>
           <Col lg={4}>
-            <h2>Founder</h2>
-            <Link href={`/profile?id=${author.id}`}>
-              <a>
-                <div className={styles.authorProfile}>
-                  <Avatar hash={author.avatarHash} />
-                  <div className={styles.authorIdentity}>
-                    <h2>{author.name}</h2>
-                  </div>
-                </div>
-              </a>
-            </Link>
-            <h2>Other Participants</h2>
-            <ul className="vertical-user-group">
-              {trip.reservations
-                .filter((r) => !isAuthor(r))
-                .map(({ user: { id, name, avatarHash } }) => {
-                  return (
-                    <li key={id}>
-                      <Link href={`/profile?id=${id}`}>
-                        <a>
-                          <Avatar hash={avatarHash} />
-                          <h3>{name}</h3>
-                        </a>
-                      </Link>
-                    </li>
-                  );
-                })}
-            </ul>
+            <div className={styles.userList}>
+              <section>
+                <h2>Founder</h2>
+                <Link href={`/profile?id=${author.id}`}>
+                  <a>
+                    <div className={styles.authorProfile}>
+                      <Avatar hash={author.avatarHash} />
+                      <div className={styles.authorIdentity}>
+                        <h2>{author.name}</h2>
+                      </div>
+                    </div>
+                  </a>
+                </Link>
+              </section>
+              <section>
+                <h2>Other Participants</h2>
+                <ul className="vertical-user-group">
+                  {trip.reservations
+                    .filter((r) => !isAuthor(r))
+                    .map(({ user: { id, name, avatarHash } }) => {
+                      return (
+                        <li key={id}>
+                          <Link href={`/profile?id=${id}`}>
+                            <a>
+                              <Avatar hash={avatarHash} />
+                              <h3>{name}</h3>
+                            </a>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                </ul>
+              </section>
+            </div>
           </Col>
         </Row>
       </Container>

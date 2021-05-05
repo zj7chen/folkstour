@@ -5,6 +5,12 @@ import TripCapacity from "components/TripCapacity";
 import TripCard from "components/TripCard";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
+import LocationOverview from "components/LocationOverview";
+import { displayDate } from "client/display";
+import Driving from "components/icons/Driving";
+import Trekking from "components/icons/Trekking";
+import Cycling from "components/icons/Cycling";
+import styles from "./search-trip.module.css";
 
 function SearchTripPage(props) {
   return (
@@ -12,18 +18,38 @@ function SearchTripPage(props) {
       left={<SearchTripForm />}
       right={props.trips.map((trip) => (
         <TripCard key={trip.id} trip={trip}>
-          <div>
-            {displayLocation(trip.locations[0])},{" "}
-            {displayLocation(trip.locations[trip.locations.length - 1])}
-          </div>
-          <div>
-            Trip Time: {trip.tripBeginTime}, {trip.tripEndTime},
+          {/* This is the object, so why can't I do .location in return props? 
+          {
+              location: { city: 'Ottawa', country: 'Canada', province: 'Ontario' }
+          }*/}
+          <LocationOverview
+            start={trip.startLocation.location}
+            end={trip.endLocation.location}
+            length={trip.numLocations}
+          />
+          <div className="d-flex justify-content-between mb-2">
+            <div>Start date: {displayDate(new Date(trip.tripBeginTime))}</div>
+            <div>End date: {displayDate(new Date(trip.tripEndTime))}</div>
           </div>
           <TripCapacity
             teamSize={trip.teamSize}
             reservations={trip.reservations}
           />
-          <div>Transport: {trip.transports.join(" ")}</div>
+          <ul className={styles.tripTransports}>
+            {trip.transports.map((transport, i) => {
+              const Transport = {
+                DRIVING: Driving,
+                TREKKING: Trekking,
+                CYCLING: Cycling,
+              }[transport];
+              return (
+                // Anything better than 'i' as a key?
+                <li key={i}>
+                  <Transport />
+                </li>
+              );
+            })}
+          </ul>
         </TripCard>
       ))}
     />
@@ -136,7 +162,9 @@ export async function getServerSideProps({ req, query }) {
           tripBeginTime: tripBeginTime.toISOString(),
           tripEndTime: tripEndTime.toISOString(),
           transports: transports.map(({ transport }) => transport),
-          locations: locations.map(({ location }) => location),
+          startLocation: locations[0],
+          endLocation: locations[locations.length - 1],
+          numLocations: locations.length,
           reservations,
         })
       ),

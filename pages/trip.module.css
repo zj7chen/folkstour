@@ -10,3 +10,7 @@
   display: inline;
   margin-right: 0.5rem;
 }
+
+.userList > section > h2 {
+  font-size: 1rem;
+}

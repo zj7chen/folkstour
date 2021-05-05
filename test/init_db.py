@@ -29,12 +29,19 @@ connection.close()
 
 print('inserting test data')
 s = requests.Session()
+
+# ////////////////////////////////////
+#           Users & Trips
+# ////////////////////////////////////
+
+# User1
 s.post(f'{host}/api/signup', json={
     'email': 'john@example.com',
     'password': '123456',
     'name': 'John Smith',
     'gender': 'MALE',
 })
+
 s.post(f'{host}/api/update-profile', json={
     'avatar': base64.b64encode((test_d / 'john.png').read_bytes()).decode('ascii'),
     'selfIntro': '''\
@@ -50,6 +57,8 @@ my organization, attention to detail and time management skills.”
 - “My name is Rylan Curtis, and I’m chief engineer for Jacobs and Associates.”
 '''
 })
+
+# User1 creates trip1
 s.post(f'{host}/api/create-trip', json={
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Toronto'},
@@ -73,12 +82,15 @@ services.
     'expense': 300,
     'gender': 'ANY',
 })
+
+# User2
 s.post(f'{host}/api/signup', json={
     'email': 'chifanle@example.com',
     'password': '123456',
     'name': '传奇世界你和我',
     'gender': 'FEMALE',
 })
+
 s.post(f'{host}/api/update-profile', json={
     'avatar': base64.b64encode((test_d / 'wonder.png').read_bytes()).decode('ascii'),
     'selfIntro': '''
@@ -95,6 +107,8 @@ s.post(f'{host}/api/update-profile', json={
 　　内心也渴望一份轰轰烈烈的情感，期待理想中的你能够早日出现。正如豆芽所说：老子脾气暴躁，但是老子爱你
 '''
 })
+
+# User2 creates trip2
 s.post(f'{host}/api/create-trip', json={
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Burlington'},
@@ -112,5 +126,50 @@ s.post(f'{host}/api/create-trip', json={
 ''',
     'teamSize': 'FOUR_SIX',
     'expense': 1000,
+    'gender': 'ANY',
+})
+
+# User3
+s.post(f'{host}/api/signup', json={
+    'email': 'niuniu@example.com',
+    'password': '123456',
+    'name': '武当张真人',
+    'gender': 'FEMALE',
+})
+
+s.post(f'{host}/api/update-profile', json={
+    'avatar': base64.b64encode((test_d / 'shen.png').read_bytes()).decode('ascii'),
+    'selfIntro': '''
+工作学习：93年天蝎座，163cm，海外留学本科毕业，在传媒公司做宣传策划，收入稳定，偶尔加班，较少应酬。
+
+信奉“活到老学到老”的箴言，始终在为更美好的生活努力奋斗着。生活情境：热爱生活有情趣有追求，
+
+喜欢一切美好的事物，对简约而富有质感的物品情有独钟。愿意分担家务，分享快乐，待人随和。性格爱好：活泼开朗，
+
+动静皆宜，是一个容易相处善解人意的姑娘。喜欢阅读、旅行、音乐、画画、写作、拍照等等。每年都会去旅行，保持对世界的好奇心。
+'''
+})
+
+# User3 creates trip3
+s.post(f'{host}/api/create-trip', json={
+    'locations': [
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Sudbury'},
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Windsor'},
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Vaughan'},
+    ],
+    'dates': {
+        'start': '2021-06-30',
+        'end': '2021-07-10',
+    },
+    'transports': ['DRIVING', 'CYCLING'],
+    'title': '好马不吃回头草，猪精要做弼马温',
+    'description': '''\
+科学研究起源于问题，问题又有两类：
+一类是经验问题，关注的是经验事实与理论的相容性，即经验事实对理论的支持或否证，以及理论对观察的渗透，理论预测新的实验事实的能力等问题；
+另一类是概念问题，关注的是理论本身的自洽性，洞察力，精确度，统一性以及与其他理论的相容程度和理论竞争等问题。科学研究提供的对自然界作出统一理解的实在图景，解释性范式或模型就是“自然秩序理想”，它使分散的经验事实互相联系起来，构成理论体系的基本公理和原则，是整个科学理论的基础和核心。
+''',
+    'teamSize': 'ANY',
+    'expense': 20000,
     'gender': 'ANY',
 })
