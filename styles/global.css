@@ -2,24 +2,28 @@
   margin-bottom: 0;
 }
 
-.horizontal-image-group {
+.horizontal-group {
   display: flex;
   margin: 0;
   padding: 0;
 }
 
-.horizontal-image-group > * {
+.horizontal-group > * {
   display: block;
 }
 
-.horizontal-image-group > *:not(:last-child) {
+.horizontal-group > *:not(:last-child) {
   margin-right: 0.5rem;
 }
 
-.horizontal-image-group img {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-  width: 2rem;
+.group-size-text > * {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.group-size-avatar > * {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .vertical-user-group {
@@ -29,11 +33,17 @@
 }
 
 .vertical-user-group img {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
   width: 4rem;
 }
 
 .vertical-user-group > * {
   display: block;
+}
+
+.male svg {
+  fill: #007bff;
+}
+
+.female svg {
+  fill: #e83e8c;
 }

@@ -17,6 +17,7 @@
 }
 
 .elided {
+  align-self: center;
   color: #6c757d;
   font-size: 80%;
 }

@@ -1,6 +1,11 @@
+import styles from "./Avatar.module.css";
+
 function Avatar({ hash }) {
   return (
-    <img src={hash ? `/api/image?hash=${hash}` : "/avatar_placeholder.png"} />
+    <img
+      className={styles.image}
+      src={hash ? `/api/image?hash=${hash}` : "/avatar_placeholder.png"}
+    />
   );
 }
 

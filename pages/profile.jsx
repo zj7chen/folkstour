@@ -2,7 +2,7 @@ import { displayDate } from "client/display";
 import Avatar from "components/Avatar";
 import Female from "components/icons/Female";
 import Male from "components/icons/Male";
-import LocationOverview from "components/LocationOverview";
+import TripFromTo from "components/TripFromTo";
 import StickyLayout from "components/StickyLayout";
 import TripCard from "components/TripCard";
 import Card from "react-bootstrap/Card";
@@ -12,7 +12,7 @@ import styles from "./profile.module.css";
 
 function ProfilePage({ user }) {
   const Gender = { MALE: Male, FEMALE: Female }[user.gender];
-  const genderClass = { MALE: styles.male, FEMALE: styles.female }[user.gender];
+  const genderClass = { MALE: "male", FEMALE: "female" }[user.gender];
   return (
     <StickyLayout
       left={
@@ -51,18 +51,15 @@ function ProfilePage({ user }) {
             <h2>Participating Trips</h2>
             {user.reservations.map(({ trip }) => (
               <TripCard key={trip.id} trip={trip}>
-                <LocationOverview
-                  start={trip.startLocation}
-                  end={trip.endLocation}
+                <TripFromTo
+                  startLocation={trip.startLocation}
+                  endLocation={trip.endLocation}
+                  startDate={new Date(trip.tripBeginTime)}
+                  endDate={new Date(trip.tripEndTime)}
                   length={trip.numLocations}
                 />
-                <div className="d-flex justify-content-between mb-2">
-                  <div>
-                    Start date: {displayDate(new Date(trip.tripBeginTime))}
-                  </div>
-                  <div>End date: {displayDate(new Date(trip.tripEndTime))}</div>
-                </div>
-                <ul className="horizontal-image-group">
+                <div className="mb-2" />
+                <ul className="horizontal-group group-size-avatar">
                   {trip.reservations.map(({ user: { id, avatarHash } }) => (
                     <li key={id}>
                       <Avatar hash={avatarHash} />
@@ -98,8 +95,14 @@ export async function getServerSideProps({ query }) {
             select: {
               id: true,
               title: true,
+              genderRequirement: true,
               tripBeginTime: true,
               tripEndTime: true,
+              transports: {
+                select: {
+                  transport: true,
+                },
+              },
               locations: {
                 orderBy: {
                   order: "asc",
@@ -138,11 +141,20 @@ export async function getServerSideProps({ query }) {
       user: {
         ...rest,
         reservations: reservations.map(
-          ({ trip: { tripBeginTime, tripEndTime, locations, ...rest } }) => ({
+          ({
+            trip: {
+              tripBeginTime,
+              tripEndTime,
+              transports,
+              locations,
+              ...rest
+            },
+          }) => ({
             trip: {
               ...rest,
               tripBeginTime: tripBeginTime.toISOString(),
               tripEndTime: tripEndTime.toISOString(),
+              transports: transports.map(({ transport }) => transport),
               startLocation: locations[0].location,
               endLocation: locations[locations.length - 1].location,
               numLocations: locations.length,

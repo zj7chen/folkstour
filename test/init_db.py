@@ -173,3 +173,24 @@ s.post(f'{host}/api/create-trip', json={
     'expense': 20000,
     'gender': 'ANY',
 })
+
+# User3 creates trip4
+s.post(f'{host}/api/create-trip', json={
+    'locations': [
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
+    ],
+    'dates': {
+        'start': '2021-06-30',
+        'end': '2021-07-10',
+    },
+    'transports': ['DRIVING', 'CYCLING'],
+    'title': 'Go visit the flying pig',
+    'description': '''\
+科学研究起源于问题，问题又有两类：
+一类是经验问题，关注的是经验事实与理论的相容性，即经验事实对理论的支持或否证，以及理论对观察的渗透，理论预测新的实验事实的能力等问题；
+另一类是概念问题，关注的是理论本身的自洽性，洞察力，精确度，统一性以及与其他理论的相容程度和理论竞争等问题。科学研究提供的对自然界作出统一理解的实在图景，解释性范式或模型就是“自然秩序理想”，它使分散的经验事实互相联系起来，构成理论体系的基本公理和原则，是整个科学理论的基础和核心。
+''',
+    'teamSize': 'ANY',
+    'expense': 2000,
+    'gender': 'ANY',
+})

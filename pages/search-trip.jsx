@@ -1,15 +1,10 @@
-import { displayLocation } from "client/display";
 import SearchTripForm from "components/SearchTripForm";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
 import TripCard from "components/TripCard";
+import TripFromTo from "components/TripFromTo";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
-import LocationOverview from "components/LocationOverview";
-import { displayDate } from "client/display";
-import Driving from "components/icons/Driving";
-import Trekking from "components/icons/Trekking";
-import Cycling from "components/icons/Cycling";
 import styles from "./search-trip.module.css";
 
 function SearchTripPage(props) {
@@ -18,38 +13,17 @@ function SearchTripPage(props) {
       left={<SearchTripForm />}
       right={props.trips.map((trip) => (
         <TripCard key={trip.id} trip={trip}>
-          {/* This is the object, so why can't I do .location in return props? 
-          {
-              location: { city: 'Ottawa', country: 'Canada', province: 'Ontario' }
-          }*/}
-          <LocationOverview
-            start={trip.startLocation.location}
-            end={trip.endLocation.location}
+          <TripFromTo
+            startLocation={trip.startLocation}
+            endLocation={trip.endLocation}
+            startDate={new Date(trip.tripBeginTime)}
+            endDate={new Date(trip.tripEndTime)}
             length={trip.numLocations}
           />
-          <div className="d-flex justify-content-between mb-2">
-            <div>Start date: {displayDate(new Date(trip.tripBeginTime))}</div>
-            <div>End date: {displayDate(new Date(trip.tripEndTime))}</div>
-          </div>
           <TripCapacity
             teamSize={trip.teamSize}
             reservations={trip.reservations}
           />
-          <ul className={styles.tripTransports}>
-            {trip.transports.map((transport, i) => {
-              const Transport = {
-                DRIVING: Driving,
-                TREKKING: Trekking,
-                CYCLING: Cycling,
-              }[transport];
-              return (
-                // Anything better than 'i' as a key?
-                <li key={i}>
-                  <Transport />
-                </li>
-              );
-            })}
-          </ul>
         </TripCard>
       ))}
     />
@@ -83,6 +57,7 @@ export async function getServerSideProps({ req, query }) {
     select: {
       id: true,
       title: true,
+      genderRequirement: true,
       tripBeginTime: true,
       tripEndTime: true,
       transports: {
@@ -162,8 +137,8 @@ export async function getServerSideProps({ req, query }) {
           tripBeginTime: tripBeginTime.toISOString(),
           tripEndTime: tripEndTime.toISOString(),
           transports: transports.map(({ transport }) => transport),
-          startLocation: locations[0],
-          endLocation: locations[locations.length - 1],
+          startLocation: locations[0].location,
+          endLocation: locations[locations.length - 1].location,
           numLocations: locations.length,
           reservations,
         })
