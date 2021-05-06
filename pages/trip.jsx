@@ -1,20 +1,20 @@
 import countries from "cities.json";
-import { displayLocation } from "client/display";
+import { displayDate, displayLocation } from "client/display";
 import submit from "client/submit";
 import Avatar from "components/Avatar";
-import NavBar from "components/NavBar";
+import PersonAdd from "components/icons/PersonAdd";
+import PersonRemove from "components/icons/PersonRemove";
 import RouteMap from "components/RouteMap";
+import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
+import TripIcons from "components/TripIcons";
 import Link from "next/Link";
 import { useRouter } from "next/router";
 import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
+import Card from "react-bootstrap/Card";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
 import styles from "./trip.module.css";
-import { displayDate } from "client/display";
 
 function TripPage({ trip }) {
   const router = useRouter();
@@ -25,94 +25,116 @@ function TripPage({ trip }) {
 
   const author = trip.reservations.find(isAuthor).user;
   return (
-    <div>
-      <NavBar />
-      <Container fluid="xl">
-        <Row>
-          <Col lg={8}>
-            <Button
-              variant={trip.reserved ? "danger" : "outline-success"}
-              onClick={async () => {
-                await submit("/api/update-reservation", {
-                  tripId: trip.id,
-                  reserve: !trip.reserved,
-                });
-                router.replace(router.asPath);
-              }}
-            >
-              {trip.reserved ? "Quit" : "Join"}
-            </Button>
+    <StickyLayout
+      flipped
+      main={
+        <div className="card-list">
+          <section>
             <h1>{trip.title}</h1>
-            <ul>
-              <li>{trip.genderRequirement}</li>
-              <li>{trip.transports}</li>
-            </ul>
-            <h2>Locations</h2>
-            <ul>
-              {trip.locations.map((location, i) => (
-                <li key={i}>{displayLocation(location)}</li>
-              ))}
-            </ul>
-            <ul>
-              <li>Start date: {displayDate(new Date(trip.tripBeginTime))}</li>
-              <li>End date: {displayDate(new Date(trip.tripEndTime))}</li>
-            </ul>
-            <h2>Team Capacity</h2>
-            <TripCapacity
-              teamSize={trip.teamSize}
-              reservations={trip.reservations.length}
-            />
-            <h2>Expected Expense</h2>
-            <span>${trip.expectedExpense}</span>
+            <div className="d-flex justify-content-between">
+              <TripIcons trip={trip} />
+              <Button
+                className="align-self-start"
+                variant={trip.reserved ? "danger" : "outline-success"}
+                onClick={async () => {
+                  await submit("/api/update-reservation", {
+                    tripId: trip.id,
+                    reserve: !trip.reserved,
+                  });
+                  router.replace(router.asPath);
+                }}
+              >
+                <div className="iconed-text">
+                  {trip.reserved ? (
+                    <>
+                      <PersonRemove />
+                      <span>Quit</span>
+                    </>
+                  ) : (
+                    <>
+                      <PersonAdd />
+                      <span>Request to Join</span>
+                    </>
+                  )}
+                </div>
+              </Button>
+            </div>
+          </section>
+          <section>
+            <h2>Overview</h2>
+            <Card>
+              <Card.Body className={styles.overview}>
+                <div className="text-muted">Locations:</div>
+                <ul className={styles.locations}>
+                  {trip.locations.map((location, i) => (
+                    <li key={i}>{displayLocation(location)}</li>
+                  ))}
+                </ul>
+                <div className="text-muted">Start date:</div>
+                <div>{displayDate(new Date(trip.tripBeginTime))}</div>
+                <div className="text-muted">End date:</div>
+                <div>{displayDate(new Date(trip.tripEndTime))}</div>
+                <div className="text-muted">Expected Expense:</div>
+                <div>${trip.expectedExpense} / day</div>
+              </Card.Body>
+            </Card>
+          </section>
+          <section>
             <h2>Description</h2>
-            <p>{trip.description}</p>
-
+            <Card body>
+              <p>{trip.description}</p>
+            </Card>
+          </section>
+          <section>
             <h2>Route</h2>
             <RouteMap
               locations={trip.locations.map(
                 (city) => countries[city.country][city.province][city.city]
               )}
             />
-          </Col>
-          <Col lg={4}>
-            <div className={styles.userList}>
-              <section>
-                <h2>Founder</h2>
-                <Link href={`/profile?id=${author.id}`}>
-                  <a>
-                    <div className={styles.authorProfile}>
-                      <Avatar hash={author.avatarHash} />
-                      <div className={styles.authorIdentity}>
-                        <h2>{author.name}</h2>
-                      </div>
-                    </div>
-                  </a>
-                </Link>
-              </section>
-              <section>
-                <h2>Other Participants</h2>
-                <ul className="vertical-user-group">
-                  {trip.reservations
-                    .filter((r) => !isAuthor(r))
-                    .map(({ user: { id, name, avatarHash } }) => {
-                      return (
-                        <li key={id}>
-                          <Link href={`/profile?id=${id}`}>
-                            <a>
-                              <Avatar hash={avatarHash} />
-                              <h3>{name}</h3>
-                            </a>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </section>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+          </section>
+        </div>
+      }
+      side={
+        <div className="card-list">
+          <section>
+            <h2>Capacity</h2>
+            <TripCapacity
+              teamSize={trip.teamSize}
+              reservations={trip.reservations.length}
+            />
+          </section>
+          <section>
+            <h2>Founder</h2>
+            <Link href={`/profile?id=${author.id}`}>
+              <a className={styles.authorProfile}>
+                <Avatar hash={author.avatarHash} />
+                <span>{author.name}</span>
+              </a>
+            </Link>
+          </section>
+          <section>
+            <h2>Other Participants</h2>
+            <ul className="vertical-group">
+              {trip.reservations
+                .filter((r) => !isAuthor(r))
+                .map(({ user: { id, name, avatarHash } }) => {
+                  return (
+                    <li key={id}>
+                      <Link href={`/profile?id=${id}`}>
+                        <a className={styles.authorProfile}>
+                          <Avatar hash={avatarHash} />
+                          <span>{name}</span>
+                        </a>
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </section>
+        </div>
+      }
+    />
   );
 }
 

@@ -10,8 +10,8 @@ import styles from "./search-trip.module.css";
 function SearchTripPage(props) {
   return (
     <StickyLayout
-      left={<SearchTripForm />}
-      right={props.trips.map((trip) => (
+      side={<SearchTripForm />}
+      main={props.trips.map((trip) => (
         <TripCard key={trip.id} trip={trip}>
           <TripFromTo
             startLocation={trip.startLocation}
@@ -20,10 +20,13 @@ function SearchTripPage(props) {
             endDate={new Date(trip.tripEndTime)}
             length={trip.numLocations}
           />
-          <TripCapacity
-            teamSize={trip.teamSize}
-            reservations={trip.reservations}
-          />
+          <div className={styles.capacity}>
+            <div>Capacity:</div>
+            <TripCapacity
+              teamSize={trip.teamSize}
+              reservations={trip.reservations}
+            />
+          </div>
         </TripCard>
       ))}
     />

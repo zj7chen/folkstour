@@ -1,14 +1,28 @@
+.authorProfile {
+  font-weight: 600;
+}
+
 .authorProfile > img {
-  display: block;
-  margin-bottom: 0.5rem;
-  width: 8rem;
-}
-
-.authorIdentity > h1 {
-  display: inline;
   margin-right: 0.5rem;
+  width: 3rem;
 }
 
-.userList > section > h2 {
-  font-size: 1rem;
+.overview {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1rem;
+}
+
+.locations {
+  margin: 0;
+  padding: 0;
+}
+
+.locations > * {
+  display: inline-block;
+}
+
+.locations > *:not(:first-child)::before {
+  margin: 0 0.5rem;
+  content: "⇀";
 }

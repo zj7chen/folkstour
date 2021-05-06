@@ -2,6 +2,14 @@
   margin-bottom: 0;
 }
 
+.card-list > section:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
+
+.card-list > section > h2 {
+  font-size: 1rem;
+}
+
 .horizontal-group {
   display: flex;
   margin: 0;
@@ -26,17 +34,13 @@
   height: 2.5rem;
 }
 
-.vertical-user-group {
+.vertical-group {
   display: block;
   margin: 0;
   padding: 0;
 }
 
-.vertical-user-group img {
-  width: 4rem;
-}
-
-.vertical-user-group > * {
+.vertical-group > * {
   display: block;
 }
 
@@ -46,4 +50,13 @@
 
 .female svg {
   fill: #e83e8c;
+}
+
+.iconed-text > svg {
+  position: relative;
+  top: 0.15em;
+  vertical-align: top;
+  margin-right: 0.25rem;
+  width: 1.2em;
+  height: 1.2em;
 }

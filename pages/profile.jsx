@@ -15,7 +15,7 @@ function ProfilePage({ user }) {
   const genderClass = { MALE: "male", FEMALE: "female" }[user.gender];
   return (
     <StickyLayout
-      left={
+      side={
         <div className={styles.userProfile}>
           <Avatar hash={user.avatarHash} />
           <div className={`${styles.userIdentity} ${genderClass}`}>
@@ -24,7 +24,7 @@ function ProfilePage({ user }) {
           </div>
         </div>
       }
-      right={
+      main={
         <div className={styles.userContent}>
           <section>
             <h2>Intro</h2>

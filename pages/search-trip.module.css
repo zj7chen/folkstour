@@ -1,8 +1,12 @@
-.tripTransports svg {
-  width: 1.5rem;
-  height: 1.5rem;
+.capacity {
+  display: flex;
 }
 
-.tripTransports li {
-  display: block;
+.capacity > *:first-child {
+  margin-right: 0.5rem;
+}
+
+.capacity > *:last-child {
+  flex-grow: 1;
+  align-self: center;
 }

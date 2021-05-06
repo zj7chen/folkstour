@@ -1,10 +1,6 @@
-import Cycling from "components/icons/Cycling";
-import Driving from "components/icons/Driving";
-import Female from "components/icons/Female";
-import Male from "components/icons/Male";
-import Trekking from "components/icons/Trekking";
 import Link from "next/link";
 import Card from "react-bootstrap/Card";
+import TripIcons from "./TripIcons";
 
 // { trip } in this case is actually {trip: trip} = props
 function TripCard({ trip, children }) {
@@ -16,36 +12,7 @@ function TripCard({ trip, children }) {
             <a>{trip.title}</a>
           </Link>
         </div>
-        <div className="d-flex">
-          <ul className="horizontal-group group-size-text mr-4">
-            {(trip.genderRequirement === "ANY" ||
-              trip.genderRequirement === "MALE") && (
-              <li className="male">
-                <Male />
-              </li>
-            )}
-            {(trip.genderRequirement === "ANY" ||
-              trip.genderRequirement === "FEMALE") && (
-              <li className="female">
-                <Female />
-              </li>
-            )}
-          </ul>
-          <ul className="horizontal-group group-size-text">
-            {trip.transports.map((transport) => {
-              const Transport = {
-                DRIVING: Driving,
-                TREKKING: Trekking,
-                CYCLING: Cycling,
-              }[transport];
-              return (
-                <li key={transport}>
-                  <Transport />
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <TripIcons trip={trip} />
       </Card.Header>
       <Card.Body>{children}</Card.Body>
     </Card>
