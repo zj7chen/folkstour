@@ -34,6 +34,7 @@ function LocationInput(props) {
     <AsyncSelect
       id={props.id}
       name={props.name}
+      className={props.className}
       value={
         props.isMulti
           ? props.value.map((c) => cityToOption(c))
