@@ -6,7 +6,7 @@ import LocationInput from "components/LocationInput";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { useRouter } from "next/router";
 import DateInput from "components/DateInput";
-import { TEAM_SIZES, TEAM_SIZE_DEFAULT, TRANSPORTS } from "client/choices";
+import { TEAM_SIZES, TRANSPORTS } from "client/choices";
 
 function useInput(state, f) {
   const [value, setValue] = useState(f(state));
@@ -34,9 +34,9 @@ function SearchTripForm(props) {
     ? JSON.parse(router.query.location)
     : null;
   const [dates, setDates] = useInput(router.query.dates, parseDates);
-  // teamSize options: "ONE_THREE", "FOUR_SIX", "ANY"
-  const teamSize = router.query.teamsize ?? TEAM_SIZE_DEFAULT;
-  // transport allowed: "driving", "cycling", "trekking"
+  const teamSize = router.query.teamsize
+    ? router.query.teamsize.split(",")
+    : [];
   const transports = router.query.transports
     ? router.query.transports.split(",")
     : [];
@@ -93,17 +93,26 @@ function SearchTripForm(props) {
 
       <Form.Group>
         <Form.Label>Team Size</Form.Label>
-        <ButtonGroup className="d-block">
+        <div>
           {Object.entries(TEAM_SIZES).map(([key, { displayText }]) => (
-            <Button
+            <Form.Check
+              inline
+              id={`teamSize-${key}`}
               key={key}
-              variant={teamSize === key ? "primary" : "outline-primary"}
-              onClick={() => update({ teamsize: key })}
-            >
-              {displayText}
-            </Button>
+              label={displayText}
+              checked={teamSize.indexOf(key) !== -1}
+              type="checkbox"
+              onChange={(e) =>
+                update({
+                  teamsize: (e.target.checked
+                    ? [...teamSize, key]
+                    : teamSize.filter((t) => t !== key)
+                  ).join(","),
+                })
+              }
+            />
           ))}
-        </ButtonGroup>
+        </div>
       </Form.Group>
 
       <Form.Group>

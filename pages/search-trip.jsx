@@ -113,7 +113,7 @@ export async function getServerSideProps({ req, query }) {
         },
       ],
       teamSize: {
-        equals: teamsize !== "ANY" ? teamsize : undefined,
+        in: teamsize ? teamsize.split(",") : undefined,
       },
       transports: {
         every: {

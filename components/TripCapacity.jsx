@@ -1,8 +1,8 @@
 import ProgressBar from "react-bootstrap/ProgressBar";
+import { TEAM_SIZES } from "client/choices";
 
 function TripCapacity({ teamSize, reservations }) {
-  if (teamSize === "ANY") return "Unlimited number of participants";
-  const totalTeamSize = { ONE_THREE: 3, FOUR_SIX: 6 }[teamSize];
+  const totalTeamSize = TEAM_SIZES[teamSize].limit;
   return (
     <ProgressBar
       striped

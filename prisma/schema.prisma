@@ -48,7 +48,7 @@ model Trip {
 enum TeamSize {
   ONE_THREE
   FOUR_SIX
-  ANY
+  SEVEN_NINE
 }
 
 enum Transport {

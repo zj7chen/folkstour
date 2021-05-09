@@ -1,16 +1,17 @@
 export const TEAM_SIZES = {
   ONE_THREE: {
     displayText: "1-3",
+    limit: 3,
   },
   FOUR_SIX: {
     displayText: "4-6",
+    limit: 6,
   },
-  ANY: {
-    displayText: "Any",
+  SEVEN_NINE: {
+    displayText: "7-9",
+    limit: 9,
   },
 };
-
-export const TEAM_SIZE_DEFAULT = "ONE_THREE";
 
 export const TRANSPORTS = {
   DRIVING: {
