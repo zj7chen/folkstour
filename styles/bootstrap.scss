@@ -9,4 +9,11 @@ $h6-font-size: $font-size-base * 1;
 
 $headings-font-weight: 600;
 
+$navbar-dark-color: rgb(255, 255, 255);
+$navbar-dark-hover-color: rgba(255, 255, 255, 0.75);
+$navbar-dark-active-color: rgb(255, 255, 255, 0.5);
+
+$navbar-dark-brand-color: $navbar-dark-color;
+$navbar-dark-brand-hover-color: $navbar-dark-color;
+
 @import "node_modules/bootstrap/scss/bootstrap";

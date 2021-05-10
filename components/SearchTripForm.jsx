@@ -40,7 +40,6 @@ function SearchTripForm(props) {
   const transports = router.query.transports
     ? router.query.transports.split(",")
     : [];
-  // -1 means unrestricted estimate expense
   const [expense, setExpense] = useInput(router.query.expense, (d) => d ?? "");
 
   function update(changes) {

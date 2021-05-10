@@ -35,3 +35,7 @@
   color: #ffffff;
   fill: #ffffff;
 }
+
+.entry > h1 {
+  font-size: 3rem;
+}

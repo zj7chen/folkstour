@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { GENDERS } from "client/choices";
+import submit from "client/submit";
+import { Formik } from "formik";
+import { useRouter } from "next/router";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
-import Alert from "react-bootstrap/Alert";
-import submit from "client/submit";
-import { GENDERS } from "client/choices";
-import { Formik } from "formik";
-import { useRouter } from "next/router";
 
-function Login({ onHide }) {
+function LoginPage() {
   // useEffect(() => {
   //   if (mismatch) {
   //     setError("Passwords do not match.");
@@ -17,8 +16,9 @@ function Login({ onHide }) {
   //   }
   // }, [mismatch]);
   const router = useRouter();
+  const { redirect } = router.query;
   return (
-    <Modal show centered onHide={onHide}>
+    <Modal.Dialog>
       <Formik
         initialValues={{
           email: "",
@@ -35,9 +35,7 @@ function Login({ onHide }) {
             name,
             gender,
           });
-          // if onHide is undefined, the expression will return undefined, else call function
-          onHide?.();
-          router.replace(router.asPath);
+          router.replace(redirect ?? "/search-trip");
         }}
       >
         {({
@@ -51,7 +49,7 @@ function Login({ onHide }) {
           errors,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <Modal.Title>
                 {values.signingUp ? "Sign up" : "Login"}
               </Modal.Title>
@@ -153,9 +151,6 @@ function Login({ onHide }) {
                   ? "Already have an account?"
                   : "Create an account"}
               </Button>
-              <Button variant="secondary" onClick={onHide}>
-                Close
-              </Button>
               <Button type="submit" variant="primary">
                 {values.signingUp ? "Sign up" : "Login"}
               </Button>
@@ -163,8 +158,8 @@ function Login({ onHide }) {
           </Form>
         )}
       </Formik>
-    </Modal>
+    </Modal.Dialog>
   );
 }
 
-export default Login;
+export default LoginPage;
