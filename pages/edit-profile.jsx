@@ -102,7 +102,7 @@ function EditProfilePage({ user }) {
 }
 
 export async function getServerSideProps({ req }) {
-  const { userId } = await getSession(req);
+  const { userId } = getSession(req);
   const user = await prisma.user.findUnique({
     select: {
       gender: true,

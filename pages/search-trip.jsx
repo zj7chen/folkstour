@@ -35,7 +35,7 @@ function SearchTripPage(props) {
 
 // context stores query and other stuff
 export async function getServerSideProps({ req, query }) {
-  const { userId } = await getSession(req);
+  const { userId } = getSession(req);
   // e.g. const { title: t } = context.query
   // 是取 context.query 中 key 为 title 的 property 并赋值到 变量 t 上
   const { title, location, dates, teamsize, transports, expense } = query;
