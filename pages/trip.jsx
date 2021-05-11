@@ -16,7 +16,32 @@ import prisma from "server/prisma";
 import { getSession } from "server/session";
 import styles from "./trip.module.css";
 
-function TripPage({ reservationStatus, trip }) {
+function UserList({ title, userType, reservations }) {
+  if (reservations.length === 0) {
+    return <p className="text-muted">No {userType}</p>;
+  }
+  return (
+    <section>
+      <h2>{title}</h2>
+      <Card body>
+        <ul className="vertical-group">
+          {reservations.map(({ user: { id, name, avatarHash } }) => (
+            <li key={id}>
+              <Link href={`/profile?id=${id}`}>
+                <a className={styles.authorProfile}>
+                  <Avatar hash={avatarHash} />
+                  <span>{name}</span>
+                </a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </section>
+  );
+}
+
+function TripPage({ trip }) {
   const router = useRouter();
 
   function isAuthor(reservation) {
@@ -34,7 +59,7 @@ function TripPage({ reservationStatus, trip }) {
             <div className="d-flex justify-content-between">
               <TripIcons trip={trip} />
               <div className="align-self-start">
-                {reservationStatus === "NOT_REQUESTED" ? (
+                {trip.reservationStatus === "NOT_REQUESTED" ? (
                   <Button
                     variant="outline-success"
                     onClick={async () => {
@@ -62,7 +87,7 @@ function TripPage({ reservationStatus, trip }) {
                     <div className="iconed-text">
                       <PersonRemove />
                       <span>
-                        {reservationStatus === "PENDING"
+                        {trip.reservationStatus === "PENDING"
                           ? "Cancel Request"
                           : "Leave"}
                       </span>
@@ -125,25 +150,22 @@ function TripPage({ reservationStatus, trip }) {
               </a>
             </Link>
           </section>
-          <section>
-            <h2>Other Participants</h2>
-            <ul className="vertical-group">
-              {trip.reservations
-                .filter((r) => !isAuthor(r))
-                .map(({ user: { id, name, avatarHash } }) => {
-                  return (
-                    <li key={id}>
-                      <Link href={`/profile?id=${id}`}>
-                        <a className={styles.authorProfile}>
-                          <Avatar hash={avatarHash} />
-                          <span>{name}</span>
-                        </a>
-                      </Link>
-                    </li>
-                  );
-                })}
-            </ul>
-          </section>
+          <UserList
+            title="Other Participants"
+            userType="other participants"
+            reservations={trip.reservations.filter(
+              (r) => !isAuthor(r) && r.status === "APPROVED"
+            )}
+          />
+          {trip.authoredByCurrentUser && (
+            <UserList
+              title="Pending Requests"
+              userType="pending requests"
+              reservations={trip.reservations.filter(
+                (r) => r.status === "PENDING"
+              )}
+            />
+          )}
         </div>
       }
     />
@@ -154,18 +176,8 @@ export async function getServerSideProps({ req, query }) {
   const { userId } = getSession(req);
   let { id } = query;
   id = parseInt(id);
-  const reservation = await prisma.reservation.findUnique({
-    select: {
-      status: true,
-    },
-    where: {
-      tripId_userId: {
-        userId,
-        tripId: id,
-      },
-    },
-  });
   const {
+    authorId,
     tripBeginTime,
     tripEndTime,
     transports,
@@ -198,11 +210,6 @@ export async function getServerSideProps({ req, query }) {
         },
       },
       reservations: {
-        where: {
-          status: {
-            equals: "APPROVED",
-          },
-        },
         select: {
           user: {
             select: {
@@ -211,6 +218,7 @@ export async function getServerSideProps({ req, query }) {
               avatarHash: true,
             },
           },
+          status: true,
         },
       },
     },
@@ -221,16 +229,23 @@ export async function getServerSideProps({ req, query }) {
   });
   return {
     props: {
-      reservationStatus: reservation?.status ?? "NOT_REQUESTED",
       trip: {
         ...rest,
+        authorId,
         tripBeginTime: tripBeginTime.toISOString(),
         tripEndTime: tripEndTime.toISOString(),
         transports: transports.map(({ transport }) => transport),
         // {city, province, country}[]
         locations: locations.map(({ location }) => location),
         expectedExpense: expectedExpense.toJSON(),
-        reservations,
+        authoredByCurrentUser: authorId === userId,
+        reservations:
+          authorId === userId
+            ? reservations
+            : reservations.filter((r) => r.status == "APPROVED"),
+        reservationStatus:
+          reservations.find((r) => r.user.id === userId)?.status ??
+          "NOT_REQUESTED",
       },
     },
   };
