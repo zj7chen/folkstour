@@ -16,8 +16,8 @@ import prisma from "server/prisma";
 import { getSession } from "server/session";
 import styles from "./trip.module.css";
 
-function UserList({ title, userType, reservations }) {
-  if (reservations.length === 0) {
+function UserList({ title, userType, users, actions }) {
+  if (users.length === 0) {
     return <p className="text-muted">No {userType}</p>;
   }
   return (
@@ -25,14 +25,18 @@ function UserList({ title, userType, reservations }) {
       <h2>{title}</h2>
       <Card body>
         <ul className="vertical-group">
-          {reservations.map(({ user: { id, name, avatarHash } }) => (
-            <li key={id}>
-              <Link href={`/profile?id=${id}`}>
+          {users.map((user) => (
+            <li
+              key={user.id}
+              className="d-flex justify-content-between align-items-center"
+            >
+              <Link href={`/profile?id=${user.id}`}>
                 <a className={styles.authorProfile}>
-                  <Avatar hash={avatarHash} />
-                  <span>{name}</span>
+                  <Avatar hash={user.avatarHash} />
+                  <span>{user.name}</span>
                 </a>
               </Link>
+              {actions?.(user)}
             </li>
           ))}
         </ul>
@@ -61,6 +65,7 @@ function TripPage({ trip }) {
               <div className="align-self-start">
                 {trip.reservationStatus === "NOT_REQUESTED" ? (
                   <Button
+                    className="inline-icon"
                     variant="outline-success"
                     onClick={async () => {
                       await submit("/api/request-reservation", {
@@ -69,13 +74,12 @@ function TripPage({ trip }) {
                       router.replace(router.asPath);
                     }}
                   >
-                    <div className="iconed-text">
-                      <PersonAdd />
-                      <span>Request to Join</span>
-                    </div>
+                    <PersonAdd />
+                    <span>Request to Join</span>
                   </Button>
                 ) : (
                   <Button
+                    className="inline-icon"
                     variant="danger"
                     onClick={async () => {
                       await submit("/api/cancel-reservation", {
@@ -84,14 +88,12 @@ function TripPage({ trip }) {
                       router.replace(router.asPath);
                     }}
                   >
-                    <div className="iconed-text">
-                      <PersonRemove />
-                      <span>
-                        {trip.reservationStatus === "PENDING"
-                          ? "Cancel Request"
-                          : "Leave"}
-                      </span>
-                    </div>
+                    <PersonRemove />
+                    <span>
+                      {trip.reservationStatus === "PENDING"
+                        ? "Cancel Request"
+                        : "Leave"}
+                    </span>
                   </Button>
                 )}
               </div>
@@ -138,7 +140,9 @@ function TripPage({ trip }) {
             <h2>Capacity</h2>
             <TripCapacity
               teamSize={trip.teamSize}
-              reservations={trip.reservations.length}
+              reservations={
+                trip.reservations.filter((r) => r.status === "APPROVED").length
+              }
             />
           </section>
           <section>
@@ -153,16 +157,21 @@ function TripPage({ trip }) {
           <UserList
             title="Other Participants"
             userType="other participants"
-            reservations={trip.reservations.filter(
-              (r) => !isAuthor(r) && r.status === "APPROVED"
-            )}
+            users={trip.reservations
+              .filter((r) => !isAuthor(r) && r.status === "APPROVED")
+              .map(({ user }) => user)}
           />
           {trip.authoredByCurrentUser && (
             <UserList
               title="Pending Requests"
               userType="pending requests"
-              reservations={trip.reservations.filter(
-                (r) => r.status === "PENDING"
+              users={trip.reservations
+                .filter((r) => r.status === "PENDING")
+                .map(({ user }) => user)}
+              actions={() => (
+                <Button className="inline-icon">
+                  <PersonAdd />
+                </Button>
               )}
             />
           )}

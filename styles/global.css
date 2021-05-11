@@ -52,11 +52,14 @@
   fill: #e83e8c;
 }
 
-.iconed-text > svg {
+.inline-icon > svg {
   position: relative;
   top: 0.15em;
   vertical-align: top;
-  margin-right: 0.25rem;
   width: 1.2em;
   height: 1.2em;
+}
+
+.inline-icon > svg:not(:last-child) {
+  margin-right: 0.25rem;
 }

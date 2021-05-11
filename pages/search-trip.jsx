@@ -24,7 +24,7 @@ function SearchTripPage(props) {
             <div>Capacity:</div>
             <TripCapacity
               teamSize={trip.teamSize}
-              reservations={trip.reservations}
+              reservations={trip.numReservations}
             />
           </div>
         </TripCard>
@@ -77,9 +77,12 @@ export async function getServerSideProps({ req, query }) {
           location: true,
         },
       },
-      _count: {
+      reservations: {
+        where: {
+          status: "APPROVED",
+        },
         select: {
-          reservations: true,
+          id: true,
         },
       },
     },
@@ -133,7 +136,7 @@ export async function getServerSideProps({ req, query }) {
           tripEndTime,
           transports,
           locations,
-          _count: { reservations },
+          reservations,
           ...rest
         }) => ({
           ...rest,
@@ -143,7 +146,7 @@ export async function getServerSideProps({ req, query }) {
           startLocation: locations[0].location,
           endLocation: locations[locations.length - 1].location,
           numLocations: locations.length,
-          reservations,
+          numReservations: reservations.length,
         })
       ),
     },
