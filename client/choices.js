@@ -13,6 +13,8 @@ export const TEAM_SIZES = {
   },
 };
 
+export const TEAM_SIZE_DEFAULT = "ONE_THREE";
+
 export const TRANSPORTS = {
   DRIVING: {
     displayText: "Driving",

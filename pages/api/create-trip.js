@@ -36,7 +36,10 @@ async function handler(req, res) {
         genderRequirement: gender,
         author: { connect: { id: userId } },
         reservations: {
-          create: { userId },
+          create: {
+            userId,
+            status: "APPROVED",
+          },
         },
       },
     });

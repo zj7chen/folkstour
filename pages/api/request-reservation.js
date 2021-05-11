@@ -4,22 +4,18 @@ import { getSession } from "server/session";
 async function handler(req, res) {
   if (req.method === "POST") {
     const { userId } = getSession(req);
-    if (req.body.reserve) {
+    try {
       await prisma.reservation.create({
         data: {
           userId,
           tripId: req.body.tripId,
+          status: "PENDING",
         },
       });
-    } else {
-      await prisma.reservation.delete({
-        where: {
-          tripId_userId: {
-            userId,
-            tripId: req.body.tripId,
-          },
-        },
-      });
+    } catch (e) {
+      // TODO: find out exception type
+      console.log(e);
+      return;
     }
 
     res.json({});

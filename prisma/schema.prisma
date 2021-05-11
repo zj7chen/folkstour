@@ -68,14 +68,28 @@ enum GenderRequirement {
   ANY
 }
 
+enum ReservationStatus {
+  PENDING
+  APPROVED
+}
+
 model Reservation {
-  id     Int  @id @default(autoincrement())
+  id     Int               @id @default(autoincrement())
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User              @relation(fields: [userId], references: [id])
   tripId Int
-  trip   Trip @relation(fields: [tripId], references: [id])
+  trip   Trip              @relation(fields: [tripId], references: [id])
+  status ReservationStatus
 
   @@unique([tripId, userId])
+}
+
+model Ban {
+  id       Int  @id @default(autoincrement())
+  bannerId Int
+  banner   User @relation(name: "banner", fields: [bannerId], references: [id])
+  bannedId Int
+  banned   User @relation(name: "banned", fields: [bannedId], references: [id])
 }
 
 model User {
@@ -90,6 +104,8 @@ model User {
   gender Gender
 
   // TODO user experience rank system
+  bans         Ban[]         @relation("banner")
+  bannedBy     Ban[]         @relation("banned")
   reservations Reservation[]
   trips        Trip[]
 

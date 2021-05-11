@@ -56,8 +56,10 @@ function LoginPage() {
             }) => (
               <Form onSubmit={handleSubmit}>
                 <Modal.Header>
-                  <Modal.Title>
-                    {values.signingUp ? "Sign up" : "Login"}
+                  <Modal.Title as="h1">
+                    {values.signingUp
+                      ? "Create your account"
+                      : "Sign in to TripMate"}
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -163,7 +165,7 @@ function LoginPage() {
                       : "Create an account"}
                   </Button>
                   <Button type="submit" variant="primary">
-                    {values.signingUp ? "Sign up" : "Login"}
+                    {values.signingUp ? "Sign up" : "Sign in"}
                   </Button>
                 </Modal.Footer>
               </Form>

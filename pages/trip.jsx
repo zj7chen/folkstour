@@ -16,7 +16,7 @@ import prisma from "server/prisma";
 import { getSession } from "server/session";
 import styles from "./trip.module.css";
 
-function TripPage({ trip }) {
+function TripPage({ reservationStatus, trip }) {
   const router = useRouter();
 
   function isAuthor(reservation) {
@@ -33,31 +33,43 @@ function TripPage({ trip }) {
             <h1>{trip.title}</h1>
             <div className="d-flex justify-content-between">
               <TripIcons trip={trip} />
-              <Button
-                className="align-self-start"
-                variant={trip.reserved ? "danger" : "outline-success"}
-                onClick={async () => {
-                  await submit("/api/update-reservation", {
-                    tripId: trip.id,
-                    reserve: !trip.reserved,
-                  });
-                  router.replace(router.asPath);
-                }}
-              >
-                <div className="iconed-text">
-                  {trip.reserved ? (
-                    <>
-                      <PersonRemove />
-                      <span>Quit</span>
-                    </>
-                  ) : (
-                    <>
+              <div className="align-self-start">
+                {reservationStatus === "NOT_REQUESTED" ? (
+                  <Button
+                    variant="outline-success"
+                    onClick={async () => {
+                      await submit("/api/request-reservation", {
+                        tripId: trip.id,
+                      });
+                      router.replace(router.asPath);
+                    }}
+                  >
+                    <div className="iconed-text">
                       <PersonAdd />
                       <span>Request to Join</span>
-                    </>
-                  )}
-                </div>
-              </Button>
+                    </div>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="danger"
+                    onClick={async () => {
+                      await submit("/api/cancel-reservation", {
+                        tripId: trip.id,
+                      });
+                      router.replace(router.asPath);
+                    }}
+                  >
+                    <div className="iconed-text">
+                      <PersonRemove />
+                      <span>
+                        {reservationStatus === "PENDING"
+                          ? "Cancel Request"
+                          : "Leave"}
+                      </span>
+                    </div>
+                  </Button>
+                )}
+              </div>
             </div>
           </section>
           <section>
@@ -142,6 +154,17 @@ export async function getServerSideProps({ req, query }) {
   const { userId } = getSession(req);
   let { id } = query;
   id = parseInt(id);
+  const reservation = await prisma.reservation.findUnique({
+    select: {
+      status: true,
+    },
+    where: {
+      tripId_userId: {
+        userId,
+        tripId: id,
+      },
+    },
+  });
   const {
     tripBeginTime,
     tripEndTime,
@@ -175,6 +198,11 @@ export async function getServerSideProps({ req, query }) {
         },
       },
       reservations: {
+        where: {
+          status: {
+            equals: "APPROVED",
+          },
+        },
         select: {
           user: {
             select: {
@@ -193,6 +221,7 @@ export async function getServerSideProps({ req, query }) {
   });
   return {
     props: {
+      reservationStatus: reservation?.status ?? "NOT_REQUESTED",
       trip: {
         ...rest,
         tripBeginTime: tripBeginTime.toISOString(),
@@ -202,7 +231,6 @@ export async function getServerSideProps({ req, query }) {
         locations: locations.map(({ location }) => location),
         expectedExpense: expectedExpense.toJSON(),
         reservations,
-        reserved: reservations.some((r) => r.user.id === userId),
       },
     },
   };
