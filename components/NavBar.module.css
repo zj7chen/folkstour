@@ -1,0 +1,20 @@
+@media (max-width: 767.98px) {
+  .content {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .content {
+    display: flex;
+  }
+
+  .content > *:first-child {
+    order: 1;
+  }
+
+  .content > *:last-child {
+    order: 0;
+    margin-right: 2rem;
+  }
+}

@@ -1,15 +1,13 @@
-import { Field, Formik } from "formik";
 import FormikAdaptor from "components/FormikAdaptor";
-import LocationInput from "components/LocationInput";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 import Search from "components/icons/Search";
-import styles from "./LocationSearch.module.css";
+import LocationInput from "components/LocationInput";
+import { Field, Formik } from "formik";
 import { useRouter } from "next/router";
+import Form from "react-bootstrap/Form";
 
 const FormikLocation = FormikAdaptor(LocationInput);
 
-function LocationSearch() {
+function LocationSearch({ styles }) {
   const router = useRouter();
   return (
     <Formik
@@ -26,10 +24,11 @@ function LocationSearch() {
           <Field
             id="location"
             name="location"
+            className={styles.field}
             component={FormikLocation}
             placeholder="Where do you want to go?"
           />
-          <button type="submit" className={styles.search}>
+          <button type="submit" className={styles.button}>
             <Search />
           </button>
         </Form>

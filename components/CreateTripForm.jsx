@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 const FormikLocation = FormikAdaptor(LocationInput);
 const FormikDate = FormikAdaptor(DateInput);
 
-function CreateTripForm(props) {
+function CreateTripForm() {
   const router = useRouter();
   return (
     <Formik

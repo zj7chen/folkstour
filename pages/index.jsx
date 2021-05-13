@@ -1,4 +1,5 @@
 import LocationSearch from "components/LocationSearch";
+import searchStyles from "components/LocationSearchHome.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Nav from "react-bootstrap/Nav";
@@ -33,7 +34,7 @@ function HomePage() {
               <small>让旅途不再孤单</small>
             </h1>
             <div className="text-body">
-              <LocationSearch />
+              <LocationSearch styles={searchStyles} />
             </div>
           </div>
         </div>

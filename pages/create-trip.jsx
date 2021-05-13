@@ -1,15 +1,9 @@
-import NavBar from "components/NavBar";
 import CreateTripForm from "components/CreateTripForm";
-import Container from "react-bootstrap/Container";
+import StickyLayout from "components/StickyLayout";
 
 function CreateTripPage() {
   return (
-    <div>
-      <NavBar />
-      <Container fluid="lg">
-        <CreateTripForm />
-      </Container>
-    </div>
+    <StickyLayout side={<p>Useful tips</p>} main={<CreateTripForm />} flipped />
   );
 }
 
