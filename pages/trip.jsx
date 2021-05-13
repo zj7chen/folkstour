@@ -146,7 +146,7 @@ function TripPage({ trip }) {
             />
           </section>
           <section>
-            <h2>Founder</h2>
+            <h2>Organizer</h2>
             <Link href={`/profile?id=${author.id}`}>
               <a className={styles.authorProfile}>
                 <Avatar hash={author.avatarHash} />

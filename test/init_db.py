@@ -129,6 +129,27 @@ s.post(f'{host}/api/create-trip', json={
     'gender': 'ANY',
 })
 
+# User2 creates trip3
+s.post(f'{host}/api/create-trip', json={
+    'locations': [
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Burlington'},
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'London'},
+        {'country': 'Canada', 'province': 'Ontario', 'city': 'Cambridge'},
+    ],
+    'dates': {
+        'start': '2021-06-09',
+        'end': '2021-06-12',
+    },
+    'transports': ['CYCLING'],
+    'title': '徒步北极一百天',
+    'description': '''\
+蹲坑不带厕所纸。
+''',
+    'teamSize': 'FOUR_SIX',
+    'expense': 1000,
+    'gender': 'ANY',
+})
+
 # User3
 s.post(f'{host}/api/signup', json={
     'email': 'niuniu@example.com',
@@ -150,7 +171,7 @@ s.post(f'{host}/api/update-profile', json={
 '''
 })
 
-# User3 creates trip3
+# User3 creates trip4
 s.post(f'{host}/api/create-trip', json={
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
@@ -174,7 +195,7 @@ s.post(f'{host}/api/create-trip', json={
     'gender': 'ANY',
 })
 
-# User3 creates trip4
+# User3 creates trip5
 s.post(f'{host}/api/create-trip', json={
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
