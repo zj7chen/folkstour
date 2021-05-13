@@ -3,13 +3,14 @@ import { getSession } from "server/session";
 
 async function handler(req, res) {
   if (req.method === "POST") {
-    const { userId } = getSession(req);
+    const { userId: loginUserId } = getSession(req);
+    const { userId: requestUserId, tripId } = req.body;
     const { count } = await prisma.reservation.updateMany({
       where: {
-        userId: req.body.userId,
+        userId: requestUserId,
         trip: {
-          id: req.body.tripId,
-          authorId: userId,
+          id: tripId,
+          authorId: loginUserId,
         },
       },
       data: {

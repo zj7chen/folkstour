@@ -31,13 +31,19 @@ function DashboardPage({ myTrips, participatingTrips, requestedTrips }) {
         </section>
         <section>
           <h2>Requested</h2>
-          <div className={styles.tripList}>
-            {requestedTrips.map(({ title }) => (
-              <div>
-                <p>{title}</p>
-              </div>
-            ))}
-          </div>
+          {requestedTrips.length !== 0 ? (
+            <div className={styles.tripList}>
+              {requestedTrips.map(({ title }) => (
+                <div>
+                  <p>{title}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted">
+              None of your requests are waiting for approval
+            </p>
+          )}
         </section>
       </Container>
     </>

@@ -44,6 +44,10 @@
   display: block;
 }
 
+.vertical-group > *:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
 .male svg {
   fill: #007bff;
 }

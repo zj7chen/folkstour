@@ -17,30 +17,31 @@ import { getSession } from "server/session";
 import styles from "./trip.module.css";
 
 function UserList({ title, userType, users, actions }) {
-  if (users.length === 0) {
-    return <p className="text-muted">No {userType}</p>;
-  }
   return (
     <section>
       <h2>{title}</h2>
-      <Card body>
-        <ul className="vertical-group">
-          {users.map((user) => (
-            <li
-              key={user.id}
-              className="d-flex justify-content-between align-items-center"
-            >
-              <Link href={`/profile?id=${user.id}`}>
-                <a className={styles.authorProfile}>
-                  <Avatar hash={user.avatarHash} />
-                  <span>{user.name}</span>
-                </a>
-              </Link>
-              {actions?.(user)}
-            </li>
-          ))}
-        </ul>
-      </Card>
+      {users.length === 0 ? (
+        <p className="text-muted">No {userType}</p>
+      ) : (
+        <Card body>
+          <ul className="vertical-group">
+            {users.map((user) => (
+              <li
+                key={user.id}
+                className="d-flex justify-content-between align-items-center"
+              >
+                <Link href={`/profile?id=${user.id}`}>
+                  <a className={styles.authorProfile}>
+                    <Avatar hash={user.avatarHash} />
+                    <span>{user.name}</span>
+                  </a>
+                </Link>
+                {actions?.(user)}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </section>
   );
 }
@@ -168,8 +169,17 @@ function TripPage({ trip }) {
               users={trip.reservations
                 .filter((r) => r.status === "PENDING")
                 .map(({ user }) => user)}
-              actions={() => (
-                <Button className="inline-icon">
+              actions={(user) => (
+                <Button
+                  className="inline-icon"
+                  onClick={async () => {
+                    await submit("/api/approve-reservation", {
+                      userId: user.id,
+                      tripId: trip.id,
+                    });
+                    router.replace(router.asPath);
+                  }}
+                >
                   <PersonAdd />
                 </Button>
               )}
