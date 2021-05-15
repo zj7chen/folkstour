@@ -11,6 +11,9 @@ const COOKIE_OPTIONS =
 
 export function getSession(req) {
   const token = req.cookies.session || "";
+  if (!token) {
+    return null;
+  }
   return jwt.verify(token, PUBLIC_KEY, { algorithms: ["RS256"] });
 }
 
@@ -33,31 +36,50 @@ export function clearSession(res) {
   );
 }
 
-export const withSessionProps = (f) => async (context) => {
+export const withSessionProps = (f, { optional } = {}) => async (context) => {
   const { req } = context;
   const session = getSession(req);
-  const id = session.userId;
-  const { name, avatarHash } = await prisma.user.findUnique({
-    select: {
-      name: true,
-      avatarHash: true,
-    },
-    where: {
-      id,
-    },
-  });
+
+  if (!optional && !session) {
+    // TODO: redirect back
+    const destination = "/login";
+    return { redirect: { destination, permanent: false } };
+  }
 
   const { props, ...rest } = await f({ ...context, session });
 
+  let currentUser = null;
+  if (session) {
+    const id = session.userId;
+    const { name, avatarHash } = await prisma.user.findUnique({
+      select: {
+        name: true,
+        avatarHash: true,
+      },
+      where: {
+        id,
+      },
+    });
+    currentUser = {
+      id,
+      name,
+      avatarHash,
+    };
+  }
   return {
     props: {
       ...props,
-      currentUser: {
-        id,
-        name,
-        avatarHash,
-      },
+      currentUser,
     },
     ...rest,
   };
+};
+
+export const withApiUser = (f) => async (req, res) => {
+  const session = getSession(req);
+  if (!session) {
+    res.status(403).json({ message: "Not logged in" });
+    return;
+  }
+  await f(req, res, session);
 };

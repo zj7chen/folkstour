@@ -1,9 +1,8 @@
 import prisma from "server/prisma";
-import { getSession } from "server/session";
+import { withApiUser } from "server/session";
 
-async function handler(req, res) {
+export default withApiUser(async (req, res, { userId: loginUserId }) => {
   if (req.method === "POST") {
-    const { userId: loginUserId } = getSession(req);
     const { userId: requestUserId, tripId } = req.body;
     const { count } = await prisma.reservation.updateMany({
       where: {
@@ -27,6 +26,4 @@ async function handler(req, res) {
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }
-}
-
-export default handler;
+});

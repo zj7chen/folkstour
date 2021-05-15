@@ -36,7 +36,7 @@ function SearchTripPage({ currentUser, trips }) {
 
 // context stores query and other stuff
 export const getServerSideProps = withSessionProps(
-  async ({ query, session: { userId } }) => {
+  async ({ query, session }) => {
     // e.g. const { title: t } = context.query
     // 是取 context.query 中 key 为 title 的 property 并赋值到 变量 t 上
     const { title, location, dates, teamsize, transports, expense } = query;
@@ -48,14 +48,17 @@ export const getServerSideProps = withSessionProps(
       start = new Date(start.getTime() - 30 * 24 * 60 * 60 * 1000);
       end = new Date(end.getTime() + 30 * 24 * 60 * 60 * 1000);
     }
-    const user = await prisma.user.findUnique({
-      select: {
-        gender: true,
-      },
-      where: {
-        id: userId,
-      },
-    });
+    let user = null;
+    if (session) {
+      user = await prisma.user.findUnique({
+        select: {
+          gender: true,
+        },
+        where: {
+          id: userId,
+        },
+      });
+    }
     const trips = await prisma.trip.findMany({
       orderBy: {
         updatedAt: "desc",
@@ -107,11 +110,13 @@ export const getServerSideProps = withSessionProps(
           lte: end,
         },
         OR: [
-          {
-            genderRequirement: {
-              equals: user.gender,
-            },
-          },
+          user
+            ? {
+                genderRequirement: {
+                  equals: user.gender,
+                },
+              }
+            : undefined,
           {
             genderRequirement: {
               equals: "ANY",
@@ -154,7 +159,8 @@ export const getServerSideProps = withSessionProps(
         ),
       },
     };
-  }
+  },
+  { optional: true }
 );
 
 export default SearchTripPage;

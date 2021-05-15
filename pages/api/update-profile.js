@@ -1,12 +1,11 @@
-import prisma from "server/prisma";
-import { getSession } from "server/session";
-import sharp from "sharp";
 import crypto from "crypto";
+import prisma from "server/prisma";
+import { withApiUser } from "server/session";
+import sharp from "sharp";
 
 // req.body: {selfIntro, avatar?}
-async function handler(req, res) {
+export default withApiUser(async (req, res, { userId }) => {
   if (req.method === "POST") {
-    const { userId } = getSession(req);
     let { avatar, gender, selfIntro } = req.body;
     if (avatar) {
       const content = await sharp(Buffer.from(avatar, "base64"))
@@ -40,6 +39,4 @@ async function handler(req, res) {
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }
-}
-
-export default handler;
+});

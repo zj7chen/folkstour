@@ -70,6 +70,13 @@ function TripPage({ currentUser, trip }) {
                     className="inline-icon"
                     variant="outline-success"
                     onClick={async () => {
+                      if (!currentUser) {
+                        router.push({
+                          pathname: "/login",
+                          query: { redirect: router.asPath },
+                        });
+                        return;
+                      }
                       await submit("/api/request-reservation", {
                         tripId: trip.id,
                       });
@@ -193,7 +200,7 @@ function TripPage({ currentUser, trip }) {
 }
 
 export const getServerSideProps = withSessionProps(
-  async ({ query, session: { userId } }) => {
+  async ({ query, session }) => {
     let { id } = query;
     id = parseInt(id);
     const {
@@ -247,6 +254,7 @@ export const getServerSideProps = withSessionProps(
         id,
       },
     });
+    const userId = session?.userId;
     return {
       props: {
         trip: {
@@ -269,7 +277,8 @@ export const getServerSideProps = withSessionProps(
         },
       },
     };
-  }
+  },
+  { optional: true }
 );
 
 export default TripPage;
