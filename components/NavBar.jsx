@@ -7,6 +7,7 @@ import { NavDropdown } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import styles from "./NavBar.module.css";
+import submit from "client/submit";
 
 function NavBar({ currentUser }) {
   const router = useRouter();
@@ -33,7 +34,13 @@ function NavBar({ currentUser }) {
                 <Link href={`profile?id=${currentUser.id}`} passHref>
                   <NavDropdown.Item>View profile</NavDropdown.Item>
                 </Link>
-                <NavDropdown.Item>Logout</NavDropdown.Item>
+                <NavDropdown.Item
+                  onClick={async () => {
+                    await submit("/api/logout", {});
+                  }}
+                >
+                  Logout
+                </NavDropdown.Item>
               </NavDropdown>
               <Avatar hash={currentUser.avatarHash} />
             </>
