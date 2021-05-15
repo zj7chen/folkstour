@@ -26,10 +26,38 @@ export function setSession(res, userId) {
   );
 }
 
-export function clearSession(res, userId) {
-  const maxAge = 60 * 60 * 24 * 5;
+export function clearSession(res) {
   res.setHeader(
     "Set-Cookie",
     `session=; Expires=Thu, 01 Jan 1970 00:00:00 GMT${COOKIE_OPTIONS}`
   );
 }
+
+export const withSessionProps = (f) => async (context) => {
+  const { req } = context;
+  const session = getSession(req);
+  const id = session.userId;
+  const { name, avatarHash } = await prisma.user.findUnique({
+    select: {
+      name: true,
+      avatarHash: true,
+    },
+    where: {
+      id,
+    },
+  });
+
+  const { props, ...rest } = await f({ ...context, session });
+
+  return {
+    props: {
+      ...props,
+      currentUser: {
+        id,
+        name,
+        avatarHash,
+      },
+    },
+    ...rest,
+  };
+};

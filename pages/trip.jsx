@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import prisma from "server/prisma";
-import { getSession } from "server/session";
+import { withSessionProps } from "server/session";
 import styles from "./trip.module.css";
 
 function UserList({ title, userType, users, actions }) {
@@ -46,7 +46,7 @@ function UserList({ title, userType, users, actions }) {
   );
 }
 
-function TripPage({ trip }) {
+function TripPage({ currentUser, trip }) {
   const router = useRouter();
 
   function isAuthor(reservation) {
@@ -56,6 +56,7 @@ function TripPage({ trip }) {
   const author = trip.reservations.find(isAuthor).user;
   return (
     <StickyLayout
+      currentUser={currentUser}
       flipped
       main={
         <div className="card-list">
@@ -191,82 +192,84 @@ function TripPage({ trip }) {
   );
 }
 
-export async function getServerSideProps({ req, query }) {
-  const { userId } = getSession(req);
-  let { id } = query;
-  id = parseInt(id);
-  const {
-    authorId,
-    tripBeginTime,
-    tripEndTime,
-    transports,
-    locations,
-    expectedExpense,
-    reservations,
-    ...rest
-  } = await prisma.trip.findUnique({
-    select: {
-      id: true,
-      title: true,
-      authorId: true,
-      genderRequirement: true,
-      tripBeginTime: true,
-      tripEndTime: true,
-      expectedExpense: true,
-      description: true,
-      transports: {
-        select: {
-          transport: true,
-        },
-      },
-      teamSize: true,
-      locations: {
-        orderBy: {
-          order: "asc",
-        },
-        select: {
-          location: true,
-        },
-      },
-      reservations: {
-        select: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              avatarHash: true,
-            },
+export const getServerSideProps = withSessionProps(
+  async ({ query, session: { userId } }) => {
+    let { id } = query;
+    id = parseInt(id);
+    const {
+      authorId,
+      tripBeginTime,
+      tripEndTime,
+      transports,
+      locations,
+      expectedExpense,
+      reservations,
+      ...rest
+    } = await prisma.trip.findUnique({
+      select: {
+        id: true,
+        title: true,
+        authorId: true,
+        genderRequirement: true,
+        tripBeginTime: true,
+        tripEndTime: true,
+        expectedExpense: true,
+        description: true,
+        transports: {
+          select: {
+            transport: true,
           },
-          status: true,
+        },
+        teamSize: true,
+        locations: {
+          orderBy: {
+            order: "asc",
+          },
+          select: {
+            location: true,
+          },
+        },
+        reservations: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatarHash: true,
+              },
+            },
+            status: true,
+          },
         },
       },
-    },
-    where: {
-      // id: id
-      id,
-    },
-  });
-  return {
-    props: {
-      trip: {
-        ...rest,
-        authorId,
-        tripBeginTime: tripBeginTime.toISOString(),
-        tripEndTime: tripEndTime.toISOString(),
-        transports: transports.map(({ transport }) => transport),
-        // {city, province, country}[]
-        locations: locations.map(({ location }) => location),
-        expectedExpense: expectedExpense.toJSON(),
-        authoredByCurrentUser: authorId === userId,
-        reservations:
-          authorId === userId
-            ? reservations
-            : reservations.filter((r) => r.status == "APPROVED"),
-        reservationStatus:
-          reservations.find((r) => r.user.id === userId)?.status ??
-          "NOT_REQUESTED",
+      where: {
+        // id: id
+        id,
       },
-    },
-  };
-}
+    });
+    return {
+      props: {
+        trip: {
+          ...rest,
+          authorId,
+          tripBeginTime: tripBeginTime.toISOString(),
+          tripEndTime: tripEndTime.toISOString(),
+          transports: transports.map(({ transport }) => transport),
+          // {city, province, country}[]
+          locations: locations.map(({ location }) => location),
+          expectedExpense: expectedExpense.toJSON(),
+          authoredByCurrentUser: authorId === userId,
+          reservations:
+            authorId === userId
+              ? reservations
+              : reservations.filter((r) => r.status == "APPROVED"),
+          reservationStatus:
+            reservations.find((r) => r.user.id === userId)?.status ??
+            "NOT_REQUESTED",
+        },
+      },
+    };
+  }
+);
+
 export default TripPage;

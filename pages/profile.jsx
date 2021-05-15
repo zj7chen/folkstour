@@ -1,20 +1,21 @@
-import { displayDate } from "client/display";
 import Avatar from "components/Avatar";
 import Female from "components/icons/Female";
 import Male from "components/icons/Male";
-import TripFromTo from "components/TripFromTo";
 import StickyLayout from "components/StickyLayout";
 import TripCard from "components/TripCard";
+import TripFromTo from "components/TripFromTo";
 import Card from "react-bootstrap/Card";
 import ReactMarkdown from "react-markdown";
 import prisma from "server/prisma";
+import { withSessionProps } from "server/session";
 import styles from "./profile.module.css";
 
-function ProfilePage({ user }) {
+function ProfilePage({ currentUser, user }) {
   const Gender = { MALE: Male, FEMALE: Female }[user.gender];
   const genderClass = { MALE: "male", FEMALE: "female" }[user.gender];
   return (
     <StickyLayout
+      currentUser={currentUser}
       side={
         <div className={styles.userProfile}>
           <Avatar hash={user.avatarHash} />
@@ -75,7 +76,7 @@ function ProfilePage({ user }) {
   );
 }
 
-export async function getServerSideProps({ query }) {
+export const getServerSideProps = withSessionProps(async ({ query }) => {
   let { id } = query;
   id = parseInt(id);
   const { reservations, ...rest } = await prisma.user.findUnique({
@@ -130,7 +131,6 @@ export async function getServerSideProps({ query }) {
           },
         },
       },
-      id: true,
     },
     where: {
       id,
@@ -165,6 +165,6 @@ export async function getServerSideProps({ query }) {
       },
     },
   };
-}
+});
 
 export default ProfilePage;

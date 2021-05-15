@@ -1,12 +1,17 @@
 import NavBar from "components/NavBar";
-import { getSession } from "server/session";
 import Container from "react-bootstrap/Container";
+import { withSessionProps } from "server/session";
 import styles from "./dashboard.module.css";
 
-function DashboardPage({ myTrips, participatingTrips, requestedTrips }) {
+function DashboardPage({
+  currentUser,
+  myTrips,
+  participatingTrips,
+  requestedTrips,
+}) {
   return (
     <>
-      <NavBar />
+      <NavBar currentUser={currentUser} />
       <Container fluid="xl" className="card-list mt-3">
         <section>
           <h2>My Trips</h2>
@@ -50,76 +55,77 @@ function DashboardPage({ myTrips, participatingTrips, requestedTrips }) {
   );
 }
 
-export async function getServerSideProps({ req }) {
-  const { userId } = getSession(req);
-  const myTrips = await prisma.trip.findMany({
-    orderBy: {
-      updatedAt: "desc",
-    },
-    select: {
-      title: true,
-      reservations: {
-        where: {
-          status: "PENDING",
-        },
-        select: {
-          id: true,
-        },
+export const getServerSideProps = withSessionProps(
+  async ({ session: { userId } }) => {
+    const myTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
       },
-    },
-    where: {
-      authorId: userId,
-    },
-  });
-  const participatingTrips = await prisma.trip.findMany({
-    orderBy: {
-      updatedAt: "desc",
-    },
-    select: {
-      title: true,
-    },
-    where: {
-      authorId: {
-        not: userId,
-      },
-      reservations: {
-        some: {
-          userId,
-          status: "APPROVED",
+      select: {
+        title: true,
+        reservations: {
+          where: {
+            status: "PENDING",
+          },
+          select: {
+            id: true,
+          },
         },
       },
-    },
-  });
-  const requestedTrips = await prisma.trip.findMany({
-    orderBy: {
-      updatedAt: "desc",
-    },
-    select: {
-      title: true,
-    },
-    where: {
-      authorId: {
-        not: userId,
+      where: {
+        authorId: userId,
       },
-      reservations: {
-        some: {
-          userId,
-          status: "PENDING",
+    });
+    const participatingTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        title: true,
+      },
+      where: {
+        authorId: {
+          not: userId,
+        },
+        reservations: {
+          some: {
+            userId,
+            status: "APPROVED",
+          },
         },
       },
-    },
-  });
+    });
+    const requestedTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        title: true,
+      },
+      where: {
+        authorId: {
+          not: userId,
+        },
+        reservations: {
+          some: {
+            userId,
+            status: "PENDING",
+          },
+        },
+      },
+    });
 
-  return {
-    props: {
-      myTrips: myTrips.map(({ reservations, ...rest }) => ({
-        ...rest,
-        numReservations: reservations.length,
-      })),
-      participatingTrips,
-      requestedTrips,
-    },
-  };
-}
+    return {
+      props: {
+        myTrips: myTrips.map(({ reservations, ...rest }) => ({
+          ...rest,
+          numReservations: reservations.length,
+        })),
+        participatingTrips,
+        requestedTrips,
+      },
+    };
+  }
+);
 
 export default DashboardPage;

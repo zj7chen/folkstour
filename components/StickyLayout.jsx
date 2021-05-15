@@ -4,10 +4,10 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import styles from "./StickyLayout.module.css";
 
-function StickyLayout({ side, main, flipped }) {
+function StickyLayout({ currentUser, side, main, flipped }) {
   return (
     <>
-      <NavBar />
+      <NavBar currentUser={currentUser} />
       <Container className={styles.container} fluid="xl">
         <Row>
           {!flipped && (

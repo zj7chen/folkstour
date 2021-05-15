@@ -1,26 +1,25 @@
+import { GENDERS } from "client/choices";
 import submit from "client/submit";
-import Avatar from "components/Avatar";
 import NavBar from "components/NavBar";
 import { Formik } from "formik";
+import dynamic from "next/dynamic";
+import { useRef } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import prisma from "server/prisma";
-import { getSession } from "server/session";
-import dynamic from "next/dynamic";
-import { useRef } from "react";
 import Cropper from "react-cropper";
-import { GENDERS } from "client/choices";
+import prisma from "server/prisma";
+import { withSessionProps } from "server/session";
 
 const MarkdownEditor = dynamic(() => import("components/MarkdownEditor"), {
   ssr: false,
 });
 
-function EditProfilePage({ user }) {
+function EditProfilePage({ currentUser, user }) {
   const cropperRef = useRef(null);
   return (
     <div>
-      <NavBar />
+      <NavBar currentUser={currentUser} />
       <Container fluid="xl">
         <Formik
           initialValues={user}
@@ -101,21 +100,23 @@ function EditProfilePage({ user }) {
   );
 }
 
-export async function getServerSideProps({ req }) {
-  const { userId } = getSession(req);
-  const user = await prisma.user.findUnique({
-    select: {
-      gender: true,
-      selfIntro: true,
-    },
-    where: {
-      id: userId,
-    },
-  });
-  return {
-    props: {
-      user,
-    },
-  };
-}
+export const getServerSideProps = withSessionProps(
+  async ({ session: { userId } }) => {
+    const user = await prisma.user.findUnique({
+      select: {
+        gender: true,
+        selfIntro: true,
+      },
+      where: {
+        id: userId,
+      },
+    });
+    return {
+      props: {
+        user,
+      },
+    };
+  }
+);
+
 export default EditProfilePage;

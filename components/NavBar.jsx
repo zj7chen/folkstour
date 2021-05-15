@@ -1,12 +1,14 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
+import Avatar from "components/Avatar";
 import LocationSearch from "components/LocationSearch";
 import searchStyles from "components/LocationSearchNav.module.css";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { NavDropdown } from "react-bootstrap";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 import styles from "./NavBar.module.css";
 
-function NavBar(props) {
+function NavBar({ currentUser }) {
   const router = useRouter();
   return (
     <Navbar bg="light" expand="md" sticky="top" style={{ minHeight: "3.5rem" }}>
@@ -24,15 +26,27 @@ function NavBar(props) {
             </Link>
           </Nav>
         </div>
-        <Nav className="ml-auto">
-          <Link
-            href={`/login?${new URLSearchParams({
-              redirect: router.asPath,
-            })}`}
-            passHref
-          >
-            <Nav.Link>Sign in</Nav.Link>
-          </Link>
+        <Nav className={styles.user}>
+          {currentUser !== null ? (
+            <>
+              <NavDropdown title={currentUser.name} alignRight>
+                <Link href={`profile?id=${currentUser.id}`} passHref>
+                  <NavDropdown.Item>View profile</NavDropdown.Item>
+                </Link>
+                <NavDropdown.Item>Logout</NavDropdown.Item>
+              </NavDropdown>
+              <Avatar hash={currentUser.avatarHash} />
+            </>
+          ) : (
+            <Link
+              href={`/login?${new URLSearchParams({
+                redirect: router.asPath,
+              })}`}
+              passHref
+            >
+              <Nav.Link>Sign in</Nav.Link>
+            </Link>
+          )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>

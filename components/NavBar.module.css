@@ -18,3 +18,12 @@
     margin-right: 2rem;
   }
 }
+
+.user {
+  margin-left: auto;
+}
+
+.user img {
+  width: 2.5rem;
+  height: 2.5rem;
+}
