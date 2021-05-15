@@ -78,51 +78,54 @@ function ProfilePage({ currentUser, user }) {
 
 export const getServerSideProps = withSessionProps(async ({ query }) => {
   let { id } = query;
-  id = parseInt(id);
-  const { reservations, ...rest } = await prisma.user.findUnique({
-    select: {
-      name: true,
-      avatarHash: true,
-      selfIntro: true,
-      gender: true,
-      reservations: {
-        orderBy: {
-          trip: {
-            title: "asc",
+  let user;
+  if (typeof id === "string") {
+    id = parseInt(id);
+    user = await prisma.user.findUnique({
+      select: {
+        name: true,
+        avatarHash: true,
+        selfIntro: true,
+        gender: true,
+        reservations: {
+          orderBy: {
+            trip: {
+              title: "asc",
+            },
           },
-        },
-        select: {
-          trip: {
-            select: {
-              id: true,
-              title: true,
-              genderRequirement: true,
-              tripBeginTime: true,
-              tripEndTime: true,
-              transports: {
-                select: {
-                  transport: true,
-                },
-              },
-              locations: {
-                orderBy: {
-                  order: "asc",
-                },
-                select: {
-                  location: true,
-                },
-              },
-              reservations: {
-                orderBy: {
-                  user: {
-                    name: "asc",
+          select: {
+            trip: {
+              select: {
+                id: true,
+                title: true,
+                genderRequirement: true,
+                tripBeginTime: true,
+                tripEndTime: true,
+                transports: {
+                  select: {
+                    transport: true,
                   },
                 },
-                select: {
-                  user: {
-                    select: {
-                      id: true,
-                      avatarHash: true,
+                locations: {
+                  orderBy: {
+                    order: "asc",
+                  },
+                  select: {
+                    location: true,
+                  },
+                },
+                reservations: {
+                  orderBy: {
+                    user: {
+                      name: "asc",
+                    },
+                  },
+                  select: {
+                    user: {
+                      select: {
+                        id: true,
+                        avatarHash: true,
+                      },
                     },
                   },
                 },
@@ -131,11 +134,15 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
           },
         },
       },
-    },
-    where: {
-      id,
-    },
-  });
+      where: {
+        id,
+      },
+    });
+  }
+  if (!user) {
+    return { notFound: true };
+  }
+  const { reservations, ...rest } = user;
   return {
     props: {
       user: {

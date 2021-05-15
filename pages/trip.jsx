@@ -202,7 +202,55 @@ function TripPage({ currentUser, trip }) {
 export const getServerSideProps = withSessionProps(
   async ({ query, session }) => {
     let { id } = query;
-    id = parseInt(id);
+    let trip;
+    if (typeof id === "string") {
+      id = parseInt(id);
+      trip = await prisma.trip.findUnique({
+        select: {
+          id: true,
+          title: true,
+          authorId: true,
+          genderRequirement: true,
+          tripBeginTime: true,
+          tripEndTime: true,
+          expectedExpense: true,
+          description: true,
+          transports: {
+            select: {
+              transport: true,
+            },
+          },
+          teamSize: true,
+          locations: {
+            orderBy: {
+              order: "asc",
+            },
+            select: {
+              location: true,
+            },
+          },
+          reservations: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatarHash: true,
+                },
+              },
+              status: true,
+            },
+          },
+        },
+        where: {
+          // id: id
+          id,
+        },
+      });
+    }
+    if (!trip) {
+      return { notFound: true };
+    }
     const {
       authorId,
       tripBeginTime,
@@ -212,48 +260,7 @@ export const getServerSideProps = withSessionProps(
       expectedExpense,
       reservations,
       ...rest
-    } = await prisma.trip.findUnique({
-      select: {
-        id: true,
-        title: true,
-        authorId: true,
-        genderRequirement: true,
-        tripBeginTime: true,
-        tripEndTime: true,
-        expectedExpense: true,
-        description: true,
-        transports: {
-          select: {
-            transport: true,
-          },
-        },
-        teamSize: true,
-        locations: {
-          orderBy: {
-            order: "asc",
-          },
-          select: {
-            location: true,
-          },
-        },
-        reservations: {
-          select: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                avatarHash: true,
-              },
-            },
-            status: true,
-          },
-        },
-      },
-      where: {
-        // id: id
-        id,
-      },
-    });
+    } = trip;
     const userId = session?.userId;
     return {
       props: {
