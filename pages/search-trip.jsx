@@ -55,7 +55,7 @@ export const getServerSideProps = withSessionProps(
           gender: true,
         },
         where: {
-          id: userId,
+          id: session.userId,
         },
       });
     }
