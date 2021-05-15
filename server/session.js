@@ -37,12 +37,14 @@ export function clearSession(res) {
 }
 
 export const withSessionProps = (f, { optional } = {}) => async (context) => {
-  const { req } = context;
+  const { req, resolvedUrl } = context;
   const session = getSession(req);
 
   if (!optional && !session) {
-    // TODO: redirect back
-    const destination = "/login";
+    console.log(req);
+    const destination = `/login?${new URLSearchParams({
+      redirect: resolvedUrl,
+    })}`;
     return { redirect: { destination, permanent: false } };
   }
 
