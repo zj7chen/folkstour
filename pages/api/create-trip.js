@@ -43,6 +43,7 @@ async function handler(req, res) {
         },
       },
     });
+    console.log(`Created trip ${id}`);
     res.json({ id: trip.id });
   } else {
     res.status(405).json({ message: "Method not allowed" });
