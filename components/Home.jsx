@@ -1,28 +1,15 @@
 import LocationSearch from "components/LocationSearch";
 import searchStyles from "components/LocationSearchHome.module.css";
-import Link from "next/link";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
+import NavBar from "components/NavBar";
 import styles from "./Home.module.css";
 
-function Home() {
+function Home({ currentUser }) {
   return (
     <div>
       <video autoPlay muted loop className={styles.video}>
         <source src="/intro.mp4" type="video/mp4" />
       </video>
-      <Navbar className={styles.nav} expand="md" variant="dark">
-        <Navbar.Brand href="#home">TripMate</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto"></Nav>
-          <Nav>
-            <Link href="/login" passHref>
-              <Nav.Link>Sign in</Nav.Link>
-            </Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
+      <NavBar currentUser={currentUser} landing />
       <main className={styles.main}>
         <div className={styles.center}>
           <div className={styles.entry}>

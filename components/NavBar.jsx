@@ -9,21 +9,31 @@ import Navbar from "react-bootstrap/Navbar";
 import styles from "./NavBar.module.css";
 import submit from "client/submit";
 
-function NavBar({ currentUser }) {
+function NavBar({ currentUser, landing }) {
   const router = useRouter();
   return (
-    <Navbar bg="light" expand="md" sticky="top" style={{ minHeight: "3.5rem" }}>
-      <Navbar.Brand href="/">TripMate</Navbar.Brand>
+    <Navbar
+      bg={landing ? undefined : "light"}
+      variant={landing ? "dark" : "light"}
+      expand="md"
+      sticky="top"
+      style={{ minHeight: "3.5rem" }}
+    >
+      <Link href="/" passHref>
+        <Navbar.Brand>TripMate</Navbar.Brand>
+      </Link>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        <div className={styles.content}>
-          <LocationSearch styles={searchStyles} />
-          <Nav>
-            <Link href="/create-trip" passHref>
-              <Nav.Link>Create Trip</Nav.Link>
-            </Link>
-          </Nav>
-        </div>
+        {!landing && (
+          <div className={styles.content}>
+            <LocationSearch styles={searchStyles} />
+            <Nav>
+              <Link href="/create-trip" passHref>
+                <Nav.Link>Create Trip</Nav.Link>
+              </Link>
+            </Nav>
+          </div>
+        )}
         <Nav className={styles.user}>
           {currentUser !== null ? (
             <>

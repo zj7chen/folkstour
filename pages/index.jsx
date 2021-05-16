@@ -58,7 +58,7 @@ function Dashboard({
 
 function HomePage(props) {
   if (!props.currentUser) {
-    return <Home />;
+    return <Home {...props} />;
   } else {
     return <Dashboard {...props} />;
   }
