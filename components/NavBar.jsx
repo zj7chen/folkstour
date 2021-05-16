@@ -13,15 +13,12 @@ function NavBar({ currentUser }) {
   const router = useRouter();
   return (
     <Navbar bg="light" expand="md" sticky="top" style={{ minHeight: "3.5rem" }}>
-      <Navbar.Brand href="#home">TripMate</Navbar.Brand>
+      <Navbar.Brand href="/">TripMate</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <div className={styles.content}>
           <LocationSearch styles={searchStyles} />
           <Nav>
-            <Link href="/dashboard" passHref>
-              <Nav.Link>Dashboard</Nav.Link>
-            </Link>
             <Link href="/create-trip" passHref>
               <Nav.Link>Create Trip</Nav.Link>
             </Link>
@@ -42,7 +39,11 @@ function NavBar({ currentUser }) {
                   Logout
                 </NavDropdown.Item>
               </NavDropdown>
-              <Avatar hash={currentUser.avatarHash} />
+              <Link href={`profile?id=${currentUser.id}`}>
+                <a>
+                  <Avatar hash={currentUser.avatarHash} />
+                </a>
+              </Link>
             </>
           ) : (
             <Link

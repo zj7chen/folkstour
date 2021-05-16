@@ -1,46 +1,145 @@
-import LocationSearch from "components/LocationSearch";
-import searchStyles from "components/LocationSearchHome.module.css";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
+import Home from "components/Home";
+import NavBar from "components/NavBar";
+import Container from "react-bootstrap/Container";
+import { withSessionProps } from "server/session";
 import styles from "./index.module.css";
 
-function HomePage() {
-  const router = useRouter();
+function Dashboard({
+  currentUser,
+  myTrips,
+  participatingTrips,
+  requestedTrips,
+}) {
   return (
-    <div>
-      <video autoPlay muted loop className={styles.video}>
-        <source src="/intro.mp4" type="video/mp4" />
-      </video>
-      <Navbar className={styles.nav} expand="md" variant="dark">
-        <Navbar.Brand href="#home">TripMate</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto"></Nav>
-          <Nav>
-            <Link href="/login" passHref>
-              <Nav.Link>Sign in</Nav.Link>
-            </Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-      <main className={styles.main}>
-        <div className={styles.center}>
-          <div className={styles.entry}>
-            <h1>
-              结伴而行
-              <br />
-              <small>让旅途不再孤单</small>
-            </h1>
-            <div className="text-body">
-              <LocationSearch styles={searchStyles} />
-            </div>
+    <>
+      <NavBar currentUser={currentUser} />
+      <Container fluid="xl" className="card-list mt-3">
+        <section>
+          <h2>My Trips</h2>
+          <div className={styles.tripList}>
+            {myTrips.map(({ title, numReservations }) => (
+              <div>
+                <p>{title}</p>
+                <p>{numReservations}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      </main>
-    </div>
+        </section>
+        <section>
+          <h2>Participating Trips</h2>
+          <div className={styles.tripList}>
+            {participatingTrips.map(({ title }) => (
+              <div>
+                <p>{title}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section>
+          <h2>Requested</h2>
+          {requestedTrips.length !== 0 ? (
+            <div className={styles.tripList}>
+              {requestedTrips.map(({ title }) => (
+                <div>
+                  <p>{title}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted">
+              None of your requests are waiting for approval
+            </p>
+          )}
+        </section>
+      </Container>
+    </>
   );
 }
+
+function HomePage(props) {
+  if (!props.currentUser) {
+    return <Home />;
+  } else {
+    return <Dashboard {...props} />;
+  }
+}
+
+export const getServerSideProps = withSessionProps(
+  async ({ session }) => {
+    if (!session) {
+      return { props: {} };
+    }
+    const { userId } = session;
+    const myTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        title: true,
+        reservations: {
+          where: {
+            status: "PENDING",
+          },
+          select: {
+            id: true,
+          },
+        },
+      },
+      where: {
+        authorId: userId,
+      },
+    });
+    const participatingTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        title: true,
+      },
+      where: {
+        authorId: {
+          not: userId,
+        },
+        reservations: {
+          some: {
+            userId,
+            status: "APPROVED",
+          },
+        },
+      },
+    });
+    const requestedTrips = await prisma.trip.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        title: true,
+      },
+      where: {
+        authorId: {
+          not: userId,
+        },
+        reservations: {
+          some: {
+            userId,
+            status: "PENDING",
+          },
+        },
+      },
+    });
+
+    return {
+      props: {
+        myTrips: myTrips.map(({ reservations, ...rest }) => ({
+          ...rest,
+          numReservations: reservations.length,
+        })),
+        participatingTrips,
+        requestedTrips,
+      },
+    };
+  },
+  { optional: true }
+);
 
 export default HomePage;

@@ -41,7 +41,7 @@ function LoginPage() {
                 name,
                 gender,
               });
-              router.replace(redirect ?? "/search-trip");
+              router.replace(redirect ?? "/");
             }}
           >
             {({
