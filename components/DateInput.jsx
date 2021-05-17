@@ -30,6 +30,7 @@ function DateInput(props) {
         }}
         focusedInput={focusedInput}
         onFocusChange={(focusedInput) => setFocusedInput(focusedInput)}
+        appendToBody
       />
     </div>
   );
