@@ -1,5 +1,8 @@
+import { displayDate } from "client/display";
 import Home from "components/Home";
 import NavBar from "components/NavBar";
+import { Timeline, TimelineItem } from "components/Timeline";
+import Link from "next/link";
 import Container from "react-bootstrap/Container";
 import { withSessionProps } from "server/session";
 import styles from "./index.module.css";
@@ -14,17 +17,19 @@ function Dashboard({
     <>
       <NavBar currentUser={currentUser} />
       <Container fluid="xl" className="card-list mt-3">
-        <section>
-          <h2>My Trips</h2>
-          <div className={styles.tripList}>
-            {myTrips.map(({ title, numReservations }) => (
-              <div>
-                <p>{title}</p>
-                <p>{numReservations}</p>
+        <Timeline>
+          {myTrips.map(({ id, title, tripBeginTime, numReservations }) => (
+            <TimelineItem key={id} date={displayDate(new Date(tripBeginTime))}>
+              <div className="d-flex justify-content-between">
+                <Link href={`/trip?id=${id}`}>
+                  <a>{title}</a>
+                </Link>
+                <div>{numReservations} pending requests</div>
               </div>
-            ))}
-          </div>
-        </section>
+              <div>Organizer</div>
+            </TimelineItem>
+          ))}
+        </Timeline>
         <section>
           <h2>Participating Trips</h2>
           <div className={styles.tripList}>
@@ -76,6 +81,7 @@ export const getServerSideProps = withSessionProps(
       },
       select: {
         title: true,
+        tripBeginTime: true,
         reservations: {
           where: {
             status: "PENDING",
@@ -130,8 +136,9 @@ export const getServerSideProps = withSessionProps(
 
     return {
       props: {
-        myTrips: myTrips.map(({ reservations, ...rest }) => ({
+        myTrips: myTrips.map(({ tripBeginTime, reservations, ...rest }) => ({
           ...rest,
+          tripBeginTime: tripBeginTime.toISOString(),
           numReservations: reservations.length,
         })),
         participatingTrips,
