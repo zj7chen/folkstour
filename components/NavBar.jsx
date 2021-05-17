@@ -44,6 +44,7 @@ function NavBar({ currentUser, landing }) {
                 <NavDropdown.Item
                   onClick={async () => {
                     await submit("/api/logout", {});
+                    router.replace(router.asPath);
                   }}
                 >
                   Logout
