@@ -1,5 +1,6 @@
-import jwt from "jsonwebtoken";
 import fs from "fs";
+import jwt from "jsonwebtoken";
+import prisma from "server/prisma";
 
 const PRIVATE_KEY = fs.readFileSync("private.key");
 const PUBLIC_KEY = fs.readFileSync("public.pem");
