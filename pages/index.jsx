@@ -1,11 +1,13 @@
 import { displayDate } from "client/display";
 import Home from "components/Home";
+import Flag from "components/icons/Flag";
+import Mail from "components/icons/Mail";
+import People from "components/icons/People";
 import NavBar from "components/NavBar";
 import { Timeline, TimelineItem } from "components/Timeline";
 import Link from "next/link";
 import Container from "react-bootstrap/Container";
 import { withSessionProps } from "server/session";
-import styles from "./index.module.css";
 
 function Dashboard({ currentUser, trips }) {
   return (
@@ -36,13 +38,22 @@ function Dashboard({ currentUser, trips }) {
                       : ""}
                   </div>
                 </div>
-                <div>
-                  {authorId === currentUser.id
-                    ? "Organizer"
-                    : reservationStatus === "APPROVAL"
-                    ? "Participant"
-                    : "Requested"}
-                </div>
+                {authorId === currentUser.id ? (
+                  <div className="text-muted inline-icon">
+                    <Flag />
+                    <span>Organizer</span>
+                  </div>
+                ) : reservationStatus === "APPROVAL" ? (
+                  <div className="text-muted inline-icon">
+                    <People />
+                    <span>Participant</span>
+                  </div>
+                ) : (
+                  <div className="text-info inline-icon">
+                    <Mail />
+                    <span>Requested</span>
+                  </div>
+                )}
               </TimelineItem>
             )
           )}
