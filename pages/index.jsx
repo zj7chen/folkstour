@@ -14,50 +14,54 @@ function Dashboard({ currentUser, trips }) {
     <>
       <NavBar currentUser={currentUser} />
       <Container fluid="xl" className="card-list mt-3">
-        <Timeline>
-          {trips.map(
-            ({
-              id,
-              title,
-              tripBeginTime,
-              authorId,
-              numReservations,
-              reservationStatus,
-            }) => (
-              <TimelineItem
-                key={id}
-                date={displayDate(new Date(tripBeginTime))}
-              >
-                <div className="d-flex justify-content-between">
-                  <Link href={`/trip?id=${id}`}>
-                    <a>{title}</a>
-                  </Link>
-                  <div>
-                    {numReservations
-                      ? `${numReservations} pending requests`
-                      : ""}
+        {trips.length === 0 ? (
+          <p>You are not participating in any trips</p>
+        ) : (
+          <Timeline>
+            {trips.map(
+              ({
+                id,
+                title,
+                tripBeginTime,
+                authorId,
+                numReservations,
+                reservationStatus,
+              }) => (
+                <TimelineItem
+                  key={id}
+                  date={displayDate(new Date(tripBeginTime))}
+                >
+                  <div className="d-flex justify-content-between">
+                    <Link href={`/trip?id=${id}`}>
+                      <a>{title}</a>
+                    </Link>
+                    <div>
+                      {numReservations
+                        ? `${numReservations} pending requests`
+                        : ""}
+                    </div>
                   </div>
-                </div>
-                {authorId === currentUser.id ? (
-                  <div className="text-muted inline-icon">
-                    <Flag />
-                    <span>Organizer</span>
-                  </div>
-                ) : reservationStatus === "APPROVAL" ? (
-                  <div className="text-muted inline-icon">
-                    <People />
-                    <span>Participant</span>
-                  </div>
-                ) : (
-                  <div className="text-info inline-icon">
-                    <Mail />
-                    <span>Requested</span>
-                  </div>
-                )}
-              </TimelineItem>
-            )
-          )}
-        </Timeline>
+                  {authorId === currentUser.id ? (
+                    <div className="text-muted inline-icon">
+                      <Flag />
+                      <span>Organizer</span>
+                    </div>
+                  ) : reservationStatus === "APPROVAL" ? (
+                    <div className="text-muted inline-icon">
+                      <People />
+                      <span>Participant</span>
+                    </div>
+                  ) : (
+                    <div className="text-info inline-icon">
+                      <Mail />
+                      <span>Requested</span>
+                    </div>
+                  )}
+                </TimelineItem>
+              )
+            )}
+          </Timeline>
+        )}
       </Container>
     </>
   );
