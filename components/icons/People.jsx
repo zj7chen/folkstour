@@ -2,7 +2,7 @@ function People() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="ionicon"
+      className="ionicon"
       viewBox="0 0 512 512"
     >
       <title>People</title>
