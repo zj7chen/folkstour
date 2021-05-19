@@ -7,55 +7,46 @@ import Container from "react-bootstrap/Container";
 import { withSessionProps } from "server/session";
 import styles from "./index.module.css";
 
-function Dashboard({
-  currentUser,
-  myTrips,
-  participatingTrips,
-  requestedTrips,
-}) {
+function Dashboard({ currentUser, trips }) {
   return (
     <>
       <NavBar currentUser={currentUser} />
       <Container fluid="xl" className="card-list mt-3">
         <Timeline>
-          {myTrips.map(({ id, title, tripBeginTime, numReservations }) => (
-            <TimelineItem key={id} date={displayDate(new Date(tripBeginTime))}>
-              <div className="d-flex justify-content-between">
-                <Link href={`/trip?id=${id}`}>
-                  <a>{title}</a>
-                </Link>
-                <div>{numReservations} pending requests</div>
-              </div>
-              <div>Organizer</div>
-            </TimelineItem>
-          ))}
-        </Timeline>
-        <section>
-          <h2>Participating Trips</h2>
-          <div className={styles.tripList}>
-            {participatingTrips.map(({ title }) => (
-              <div>
-                <p>{title}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-        <section>
-          <h2>Requested</h2>
-          {requestedTrips.length !== 0 ? (
-            <div className={styles.tripList}>
-              {requestedTrips.map(({ title }) => (
-                <div>
-                  <p>{title}</p>
+          {trips.map(
+            ({
+              id,
+              title,
+              tripBeginTime,
+              authorId,
+              numReservations,
+              reservationStatus,
+            }) => (
+              <TimelineItem
+                key={id}
+                date={displayDate(new Date(tripBeginTime))}
+              >
+                <div className="d-flex justify-content-between">
+                  <Link href={`/trip?id=${id}`}>
+                    <a>{title}</a>
+                  </Link>
+                  <div>
+                    {numReservations
+                      ? `${numReservations} pending requests`
+                      : ""}
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted">
-              None of your requests are waiting for approval
-            </p>
+                <div>
+                  {authorId === currentUser.id
+                    ? "Organizer"
+                    : reservationStatus === "APPROVAL"
+                    ? "Participant"
+                    : "Requested"}
+                </div>
+              </TimelineItem>
+            )
           )}
-        </section>
+        </Timeline>
       </Container>
     </>
   );
@@ -75,74 +66,55 @@ export const getServerSideProps = withSessionProps(
       return { props: {} };
     }
     const { userId } = session;
-    const myTrips = await prisma.trip.findMany({
+    const trips = await prisma.trip.findMany({
       orderBy: {
         updatedAt: "desc",
       },
       select: {
+        id: true,
         title: true,
         tripBeginTime: true,
+        authorId: true,
         reservations: {
-          where: {
-            status: "PENDING",
-          },
           select: {
-            id: true,
+            userId: true,
+            status: true,
           },
         },
       },
       where: {
-        authorId: userId,
-      },
-    });
-    const participatingTrips = await prisma.trip.findMany({
-      orderBy: {
-        updatedAt: "desc",
-      },
-      select: {
-        title: true,
-      },
-      where: {
-        authorId: {
-          not: userId,
-        },
-        reservations: {
-          some: {
-            userId,
-            status: "APPROVED",
+        OR: [
+          { authorId: userId },
+          {
+            authorId: {
+              not: userId,
+            },
+            reservations: {
+              some: {
+                userId,
+              },
+            },
           },
-        },
-      },
-    });
-    const requestedTrips = await prisma.trip.findMany({
-      orderBy: {
-        updatedAt: "desc",
-      },
-      select: {
-        title: true,
-      },
-      where: {
-        authorId: {
-          not: userId,
-        },
-        reservations: {
-          some: {
-            userId,
-            status: "PENDING",
-          },
-        },
+        ],
       },
     });
 
+    console.log(trips[0].reservations);
     return {
       props: {
-        myTrips: myTrips.map(({ tripBeginTime, reservations, ...rest }) => ({
-          ...rest,
-          tripBeginTime: tripBeginTime.toISOString(),
-          numReservations: reservations.length,
-        })),
-        participatingTrips,
-        requestedTrips,
+        trips: trips.map(
+          ({ tripBeginTime, reservations, authorId, ...rest }) => ({
+            ...rest,
+            tripBeginTime: tripBeginTime.toISOString(),
+            reservationStatus: reservations.find((r) => r.userId === userId)
+              .status,
+            numReservations:
+              authorId === userId
+                ? reservations.filter((r) => r.status === "PENDING").length
+                : null,
+            authorId,
+          })
+        ),
       },
     };
   },

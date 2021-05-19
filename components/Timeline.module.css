@@ -3,7 +3,7 @@
 }
 
 .date {
-  flex: 4 0 0;
+  flex: 1 0 8rem;
   margin-top: 1.25rem;
   text-align: right;
 }
