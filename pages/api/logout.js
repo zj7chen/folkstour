@@ -1,12 +1,9 @@
+import { yup } from "client/validate";
+import { postApi } from "server/api";
 import { clearSession } from "server/session";
 
-async function handler(req, res) {
-  if (req.method === "POST") {
-    clearSession(res);
-    res.json({});
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
-  }
-}
+const schema = yup.object();
 
-export default handler;
+export default postApi(schema, async ({}, req, res) => {
+  clearSession(res);
+});

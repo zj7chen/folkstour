@@ -30,20 +30,27 @@ connection.close()
 print('inserting test data')
 s = requests.Session()
 
+
+def post(url, body):
+    res = s.post(url, json=body)
+    res.raise_for_status()
+
 # ////////////////////////////////////
 #           Users & Trips
 # ////////////////////////////////////
 
+
 # User1
-s.post(f'{host}/api/signup', json={
+post(f'{host}/api/signup', {
     'email': 'john@example.com',
     'password': '123456',
     'name': 'John Smith',
     'gender': 'MALE',
 })
 
-s.post(f'{host}/api/update-profile', json={
+post(f'{host}/api/update-profile', {
     'avatar': base64.b64encode((test_d / 'john.png').read_bytes()).decode('ascii'),
+    'gender': 'MALE',
     'selfIntro': '''\
 The first sentence of your self-introduction should include your name and job
 title or experience. If you’re unemployed and seeking a job, you might mention
@@ -59,7 +66,7 @@ my organization, attention to detail and time management skills.”
 })
 
 # User1 creates trip1
-s.post(f'{host}/api/create-trip', json={
+post(f'{host}/api/create-trip', {
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Toronto'},
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Waterloo'},
@@ -84,15 +91,16 @@ services.
 })
 
 # User2
-s.post(f'{host}/api/signup', json={
+post(f'{host}/api/signup', {
     'email': 'chifanle@example.com',
     'password': '123456',
     'name': '传奇世界你和我',
     'gender': 'FEMALE',
 })
 
-s.post(f'{host}/api/update-profile', json={
+post(f'{host}/api/update-profile', {
     'avatar': base64.b64encode((test_d / 'wonder.png').read_bytes()).decode('ascii'),
+    'gender': 'FEMALE',
     'selfIntro': '''
 工作学习：91年射手座，180,135，本科，外企部门经理，工作繁忙，收入波动，奖金稀少，经常加班，常常应酬。即使目前一切劳碌，也没有停止寻找爱情，始终在为能够创造更美好的生活努力生活着。
 
@@ -109,7 +117,7 @@ s.post(f'{host}/api/update-profile', json={
 })
 
 # User2 creates trip2
-s.post(f'{host}/api/create-trip', json={
+post(f'{host}/api/create-trip', {
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Burlington'},
         {'country': 'Canada', 'province': 'Ontario', 'city': 'London'},
@@ -130,7 +138,7 @@ s.post(f'{host}/api/create-trip', json={
 })
 
 # User2 creates trip3
-s.post(f'{host}/api/create-trip', json={
+post(f'{host}/api/create-trip', {
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Burlington'},
         {'country': 'Canada', 'province': 'Ontario', 'city': 'London'},
@@ -151,15 +159,16 @@ s.post(f'{host}/api/create-trip', json={
 })
 
 # User3
-s.post(f'{host}/api/signup', json={
+post(f'{host}/api/signup', {
     'email': 'niuniu@example.com',
     'password': '123456',
     'name': '武当张真人',
     'gender': 'FEMALE',
 })
 
-s.post(f'{host}/api/update-profile', json={
+post(f'{host}/api/update-profile', {
     'avatar': base64.b64encode((test_d / 'shen.png').read_bytes()).decode('ascii'),
+    'gender': 'FEMALE',
     'selfIntro': '''
 工作学习：93年天蝎座，163cm，海外留学本科毕业，在传媒公司做宣传策划，收入稳定，偶尔加班，较少应酬。
 
@@ -172,7 +181,7 @@ s.post(f'{host}/api/update-profile', json={
 })
 
 # User3 creates trip4
-s.post(f'{host}/api/create-trip', json={
+post(f'{host}/api/create-trip', {
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Sudbury'},
@@ -196,7 +205,7 @@ s.post(f'{host}/api/create-trip', json={
 })
 
 # User3 creates trip5
-s.post(f'{host}/api/create-trip', json={
+post(f'{host}/api/create-trip', {
     'locations': [
         {'country': 'Canada', 'province': 'Ontario', 'city': 'Ottawa'},
     ],

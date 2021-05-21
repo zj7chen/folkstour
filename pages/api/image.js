@@ -1,29 +1,27 @@
+import { yup } from "client/validate";
+import { ClientError, getApi } from "server/api";
 import prisma from "server/prisma";
 
-async function handler(req, res) {
-  if (req.method === "GET") {
-    const { hash } = req.query;
-    const image = await prisma.image.findUnique({
-      select: {
-        content: true,
-      },
-      where: {
-        hash,
-      },
-    });
-    if (!image) {
-      res.status(404).end();
-      return;
-    }
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader(
-      "Cache-Control",
-      `public, max-age=${10 * 365 * 24 * 60 * 60}, immutable`
-    );
-    res.end(image.content);
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
-  }
-}
+const schema = yup.object().shape({
+  hash: yup.string().required(),
+});
 
-export default handler;
+export default getApi(schema, async ({ hash }, req, res) => {
+  const image = await prisma.image.findUnique({
+    select: {
+      content: true,
+    },
+    where: {
+      hash,
+    },
+  });
+  if (!image) {
+    throw new ClientError(404, "image not found");
+  }
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader(
+    "Cache-Control",
+    `public, max-age=${10 * 365 * 24 * 60 * 60}, immutable`
+  );
+  res.end(image.content);
+});

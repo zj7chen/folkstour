@@ -1,9 +1,35 @@
+import { GENDER_REQUIREMENTS, TEAM_SIZES, TRANSPORTS } from "client/choices";
+import {
+  dateSchema,
+  locationSchema,
+  tripDescriptionSchema,
+  tripTitleSchema,
+  yup,
+} from "client/validate";
+import { postApi } from "server/api";
 import prisma from "server/prisma";
-import { withApiUser } from "server/session";
 
-export default withApiUser(async (req, res, { userId }) => {
-  if (req.method === "POST") {
-    const {
+const schema = yup.object().shape({
+  locations: yup.array().required().of(locationSchema),
+  dates: yup.object().shape({
+    start: dateSchema.required(),
+    end: dateSchema.required(),
+  }),
+  transports: yup
+    .array()
+    .required()
+    .of(yup.mixed().oneOf(Object.keys(TRANSPORTS))),
+  title: tripTitleSchema.required(),
+  description: tripDescriptionSchema.required(),
+  teamSize: yup.mixed().required().oneOf(Object.keys(TEAM_SIZES)),
+  expense: yup.number().required().positive(),
+  gender: yup.mixed().required().oneOf(Object.keys(GENDER_REQUIREMENTS)),
+});
+
+export default postApi(
+  schema,
+  async (
+    {
       locations,
       dates,
       transports,
@@ -12,7 +38,10 @@ export default withApiUser(async (req, res, { userId }) => {
       teamSize,
       expense,
       gender,
-    } = req.body;
+    },
+    req
+  ) => {
+    const { userId } = getSession(req);
     const trip = await prisma.trip.create({
       data: {
         locations: {
@@ -43,8 +72,6 @@ export default withApiUser(async (req, res, { userId }) => {
       },
     });
     console.log(`Created trip ${id}`);
-    res.json({ id: trip.id });
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
+    return { id: trip.id };
   }
-});
+);

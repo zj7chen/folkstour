@@ -1,9 +1,17 @@
+import { tripIdSchema, userIdSchema, yup } from "client/validate";
+import { ClientError, postApi } from "server/api";
 import prisma from "server/prisma";
-import { withApiUser } from "server/session";
+import { getSession } from "server/session";
 
-export default withApiUser(async (req, res, { userId: loginUserId }) => {
-  if (req.method === "POST") {
-    const { userId: requestUserId, tripId } = req.body;
+const schema = yup.object().shape({
+  userId: userIdSchema.required(),
+  tripId: tripIdSchema.required(),
+});
+
+export default postApi(
+  schema,
+  async ({ userId: requestUserId, tripId }, req) => {
+    const { userId: loginUserId } = getSession(req);
     const { count } = await prisma.reservation.updateMany({
       where: {
         userId: requestUserId,
@@ -16,14 +24,11 @@ export default withApiUser(async (req, res, { userId: loginUserId }) => {
         status: "APPROVED",
       },
     });
-    if (count > 1) throw new Error("BUG: broken update logic");
-    if (count === 0) {
-      res.status(403).json({ message: "Unauthorized operation" });
-      return;
+    if (count > 1) {
+      throw new Error("BUG: broken update logic");
     }
-
-    res.json({});
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
+    if (count === 0) {
+      throw new ClientError(403, "Unauthorized operation");
+    }
   }
-});
+);

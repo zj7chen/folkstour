@@ -114,7 +114,6 @@ export const getServerSideProps = withSessionProps(
       },
     });
 
-    console.log(trips[0].reservations);
     return {
       props: {
         trips: trips.map(
