@@ -29,7 +29,10 @@ function EditProfilePage({ currentUser, user }) {
               .getCroppedCanvas()
               ?.toDataURL()
               ?.split(";base64,")?.[1];
-            await submit("/api/update-profile", { ...values, avatar });
+            await submit("/api/update-profile", {
+              ...values,
+              avatar,
+            });
           }}
         >
           {({ values, handleChange, handleSubmit, setFieldValue }) => (

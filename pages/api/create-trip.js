@@ -8,6 +8,7 @@ import {
 } from "client/validate";
 import { postApi } from "server/api";
 import prisma from "server/prisma";
+import { getSession } from "server/session";
 
 const schema = yup.object().shape({
   locations: yup.array().required().of(locationSchema),
@@ -52,8 +53,8 @@ export default postApi(
             })),
           },
         },
-        tripBeginTime: new Date(dates.start + "T00:00:00.000Z"),
-        tripEndTime: new Date(dates.end + "T00:00:00.000Z"),
+        tripBeginTime: dates.start,
+        tripEndTime: dates.end,
         transports: {
           create: transports.map((transport) => ({ transport })),
         },
@@ -71,7 +72,7 @@ export default postApi(
         },
       },
     });
-    console.log(`Created trip ${id}`);
+    console.log("Created trip:", trip.id);
     return { id: trip.id };
   }
 );

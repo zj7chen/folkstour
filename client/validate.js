@@ -13,10 +13,13 @@ export const locationSchema = yup.object().shape({
   city: yup.string().required(),
 });
 
-export const dateSchema = yup.string().transform(function (value) {
-  if (!this.isType(value) || value === null) return value;
-  return new Date(value + "T00:00:00.000Z");
-});
+export const dateSchema = yup
+  .date()
+  .transform(function (_value, originalValue) {
+    if (typeof originalValue !== "string" || originalValue === null)
+      return originalValue;
+    return new Date(originalValue + "T00:00:00.000Z");
+  });
 
 export const nameSchema = yup.string().max(40);
 

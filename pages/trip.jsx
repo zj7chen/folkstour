@@ -8,7 +8,7 @@ import RouteMap from "components/RouteMap";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
 import TripIcons from "components/TripIcons";
-import Link from "next/Link";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -73,7 +73,9 @@ function TripPage({ currentUser, trip }) {
                       if (!currentUser) {
                         router.push({
                           pathname: "/login",
-                          query: { redirect: router.asPath },
+                          query: {
+                            redirect: router.asPath,
+                          },
                         });
                         return;
                       }
