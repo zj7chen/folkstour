@@ -41,6 +41,7 @@ function NavBar({ currentUser, landing }) {
                 <Link href={`profile?id=${currentUser.id}`} passHref>
                   <NavDropdown.Item>View profile</NavDropdown.Item>
                 </Link>
+                <NavDropdown.Divider />
                 <NavDropdown.Item
                   onClick={async () => {
                     await submit("/api/logout", {});

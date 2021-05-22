@@ -26,3 +26,9 @@
   margin: 0 0.5rem;
   content: "⇀";
 }
+
+.dropdownLink svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: #6c757d;
+}

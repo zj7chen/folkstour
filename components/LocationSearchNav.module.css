@@ -22,11 +22,11 @@
   border-radius: 4px;
   width: 64px;
   height: 38px;
-  background-color: orange;
+  background-color: #ff7c00;
 }
 
 .button > svg {
   width: 20px;
   height: 20px;
-  fill: #f8f9fa;
+  fill: #fff;
 }
