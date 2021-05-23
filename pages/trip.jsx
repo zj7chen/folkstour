@@ -244,7 +244,13 @@ function TripPage({ currentUser, trip }) {
                             body: (
                               <p>{user.name} will be removed from this trip.</p>
                             ),
-                            onConfirm: () => console.log("confirm"),
+                            onConfirm: async () => {
+                              await submit("/api/cancel-reservation", {
+                                userId: user.id,
+                                tripId: trip.id,
+                              });
+                              router.replace(router.asPath);
+                            },
                           });
                         }}
                       >
