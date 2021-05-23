@@ -87,6 +87,7 @@ function EditProfilePage({ currentUser, user }) {
                   onChange={(value) => {
                     setFieldValue("selfIntro", value);
                   }}
+                  placeholder="Tell us about yourself"
                 />
                 <Form.Text className="text-muted">
                   Maximum of 4000 characters

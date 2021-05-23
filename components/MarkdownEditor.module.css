@@ -1,0 +1,4 @@
+/* HACK: result of reverse engineering, not guaranteed to always work */
+.editor div[data-contents="true"] {
+  min-height: 6rem;
+}

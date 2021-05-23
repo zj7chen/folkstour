@@ -12,12 +12,17 @@ import FormikAdaptor from "components/FormikAdaptor";
 import LocationInput from "components/LocationInput";
 import RouteMap from "components/RouteMap";
 import { Field, Formik } from "formik";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { useRouter } from "next/router";
 
 const FormikLocation = FormikAdaptor(LocationInput);
 const FormikDate = FormikAdaptor(DateInput);
+
+const MarkdownEditor = dynamic(() => import("components/MarkdownEditor"), {
+  ssr: false,
+});
 
 function CreateTripForm() {
   const router = useRouter();
@@ -47,6 +52,7 @@ function CreateTripForm() {
         touched,
         isValid,
         errors,
+        setFieldValue,
       }) => (
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="title">
@@ -150,13 +156,16 @@ function CreateTripForm() {
 
           <Form.Group controlId="description">
             <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={6}
-              value={values.description}
-              onChange={handleChange}
+            <MarkdownEditor
+              initialValue={values.description}
+              onChange={(value) => {
+                setFieldValue("description", value);
+              }}
               placeholder="Please state any further details about the trip here"
             />
+            <Form.Text className="text-muted">
+              Maximum of 4000 characters
+            </Form.Text>
           </Form.Group>
 
           <Button variant="primary" type="submit">

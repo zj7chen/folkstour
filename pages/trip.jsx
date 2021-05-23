@@ -7,6 +7,7 @@ import EllipsisVertical from "components/icons/EllipsisVertical";
 import PersonAdd from "components/icons/PersonAdd";
 import PersonRemove from "components/icons/PersonRemove";
 import Warning from "components/icons/Warning";
+import MarkdownViewer from "components/MarkdownViewer";
 import RouteMap from "components/RouteMap";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
@@ -161,7 +162,7 @@ function TripPage({ currentUser, trip }) {
             <section>
               <h2>Description</h2>
               <Card body>
-                <p>{trip.description}</p>
+                <MarkdownViewer value={trip.description} />
               </Card>
             </section>
             <section>
