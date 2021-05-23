@@ -1,0 +1,12 @@
+.separator {
+  display: flex;
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
+.separator > span {
+  border: 1px solid #ced4da;
+  padding: 0.375rem 0.75rem;
+  color: #495057;
+  background-color: #e9ecef;
+}

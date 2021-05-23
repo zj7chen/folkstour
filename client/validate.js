@@ -15,13 +15,11 @@ export const locationSchema = yup.object().shape({
   city: yup.string().required(),
 });
 
-export const dateSchema = yup
-  .date()
-  .transform(function (_value, originalValue) {
-    if (typeof originalValue !== "string" || originalValue === null)
-      return originalValue;
-    return new Date(originalValue + "T00:00:00.000Z");
-  });
+export const dateSchema = yup.mixed().transform(function (value) {
+  if (!value) return null;
+  if (typeof value !== "string") return new Date("");
+  return new Date(value + "T00:00:00.000Z");
+});
 
 export const nameSchema = yup.string().max(40);
 
@@ -40,10 +38,17 @@ export const tripSchema = yup.object().shape({
     .required()
     .of(locationSchema)
     .min(1, "at least ${min} location must be selected"),
-  dates: yup.object().shape({
-    start: dateSchema.required(),
-    end: dateSchema.required(),
-  }),
+  dates: yup
+    .object()
+    .shape({
+      start: dateSchema.required("start date is required"),
+      end: dateSchema.required("end date is required"),
+    })
+    .test(
+      "start-before-end",
+      "end date must not be earlier than start date",
+      ({ start, end }) => start <= end
+    ),
   transports: yup
     .array()
     .required()

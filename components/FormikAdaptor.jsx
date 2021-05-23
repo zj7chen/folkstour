@@ -7,6 +7,10 @@ const FormikAdaptor =
         name={field.name}
         value={field.value}
         onChange={(value) => form.setFieldValue(field.name, value)}
+        onBlur={() => {
+          console.log("blur");
+          form.setFieldTouched(field.name, true);
+        }}
         {...props}
       />
     );

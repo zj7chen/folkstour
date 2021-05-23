@@ -35,7 +35,7 @@ function CreateTripForm() {
         title: "",
         // City[]
         locations: [],
-        dates: { start: null, end: null },
+        dates: { start: "", end: "" },
         teamSize: TEAM_SIZE_DEFAULT,
         transports: [],
         gender: GENDER_REQUIREMENT_DEFAULT,
@@ -80,7 +80,6 @@ function CreateTripForm() {
               id="locations"
               name="locations"
               component={FormikLocation}
-              onBlur={handleBlur}
               placeholder="Enter the places of your trip"
               isMulti
             />
@@ -94,9 +93,16 @@ function CreateTripForm() {
             />
           </Form.Group>
 
-          <Form.Group controlId="dates">
-            <Form.Label>Choose your dates</Form.Label>
+          <Form.Group>
+            <Form.Label>Start and End Dates</Form.Label>
             <Field id="dates" name="dates" component={FormikDate} />
+            <Feedback type="invalid" style={{ display: "block" }}>
+              {touched.dates &&
+                errors.dates &&
+                (typeof errors.dates === "string"
+                  ? errors.dates
+                  : Object.values(errors.dates).flatMap((l) => [l, <br />]))}
+            </Feedback>
           </Form.Group>
 
           <Form.Group controlId="teamSize">
