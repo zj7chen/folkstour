@@ -1,13 +1,13 @@
+import submit from "client/submit";
 import Avatar from "components/Avatar";
 import LocationSearch from "components/LocationSearch";
 import searchStyles from "components/LocationSearchNav.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { NavDropdown } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import styles from "./NavBar.module.css";
-import submit from "client/submit";
 
 function NavBar({ currentUser, landing }) {
   const router = useRouter();

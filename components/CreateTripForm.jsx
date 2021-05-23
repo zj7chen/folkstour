@@ -7,6 +7,7 @@ import {
   TRANSPORTS,
 } from "client/choices";
 import submit from "client/submit";
+import { tripSchema } from "client/validate";
 import DateInput from "components/DateInput";
 import FormikAdaptor from "components/FormikAdaptor";
 import LocationInput from "components/LocationInput";
@@ -15,6 +16,7 @@ import { Field, Formik } from "formik";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Button from "react-bootstrap/Button";
+import Feedback from "react-bootstrap/Feedback";
 import Form from "react-bootstrap/Form";
 
 const FormikLocation = FormikAdaptor(LocationInput);
@@ -28,6 +30,7 @@ function CreateTripForm() {
   const router = useRouter();
   return (
     <Formik
+      validationSchema={tripSchema}
       initialValues={{
         title: "",
         // City[]
@@ -50,18 +53,25 @@ function CreateTripForm() {
         handleBlur,
         values,
         touched,
-        isValid,
         errors,
         setFieldValue,
       }) => (
-        <Form onSubmit={handleSubmit}>
+        <Form noValidate onSubmit={handleSubmit}>
           <Form.Group controlId="title">
             <Form.Label>Title</Form.Label>
             <Form.Control
+              type="text"
+              name="title"
               value={values.title}
               onChange={handleChange}
+              onBlur={handleBlur}
+              isValid={touched.title && !errors.title}
+              isInvalid={touched.title && !!errors.title}
               placeholder="Give your trip an attractive title"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.title}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="locations">
@@ -70,9 +80,13 @@ function CreateTripForm() {
               id="locations"
               name="locations"
               component={FormikLocation}
+              onBlur={handleBlur}
               placeholder="Enter the places of your trip"
               isMulti
             />
+            <Feedback type="invalid" style={{ display: "block" }}>
+              {touched.locations && errors.locations}
+            </Feedback>
             <RouteMap
               locations={values.locations.map(
                 (city) => countries[city.country][city.province][city.city]
@@ -117,10 +131,15 @@ function CreateTripForm() {
                   name="transports"
                   value={key}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  isInvalid={touched.transports && !!errors.transports}
                   checked={values.transports.indexOf(key) !== -1}
                 />
               ))}
             </div>
+            <Feedback type="invalid" style={{ display: "block" }}>
+              {touched.transports && errors.transports}
+            </Feedback>
           </Form.Group>
 
           <Form.Group controlId="gender">
@@ -150,8 +169,14 @@ function CreateTripForm() {
               type="number"
               value={values.expense}
               onChange={handleChange}
+              onBlur={handleBlur}
+              isValid={touched.expense && !errors.expense}
+              isInvalid={touched.expense && !!errors.expense}
               placeholder="e.g. 300"
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.expense}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="description">
@@ -166,6 +191,9 @@ function CreateTripForm() {
             <Form.Text className="text-muted">
               Maximum of 4000 characters
             </Form.Text>
+            <Feedback type="invalid" style={{ display: "block" }}>
+              {errors.description}
+            </Feedback>
           </Form.Group>
 
           <Button variant="primary" type="submit">
