@@ -2,6 +2,7 @@ import { GENDERS } from "client/choices";
 import submit from "client/submit";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -17,6 +18,7 @@ function LoginPage() {
   //   }
   // }, [mismatch]);
   const router = useRouter();
+  const [error, setError] = useState("");
   const { redirect } = router.query;
   return (
     <div className={styles.background}>
@@ -35,12 +37,21 @@ function LoginPage() {
               signingUp: false,
             }}
             onSubmit={async ({ signingUp, email, password, name, gender }) => {
-              await submit(signingUp ? "/api/signup" : "/api/login", {
-                email,
-                password,
-                name,
-                gender,
-              });
+              try {
+                if (signingUp) {
+                  await submit("/api/signup", {
+                    email,
+                    password,
+                    name,
+                    gender,
+                  });
+                } else {
+                  await submit("/api/login", { email, password });
+                }
+              } catch (e) {
+                setError("Incorrect email or password, please try again");
+                return;
+              }
               router.replace(redirect ?? "/");
             }}
           >
@@ -60,6 +71,7 @@ function LoginPage() {
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                  <Alert variant="danger">{error}</Alert>
                   <Form.Group controlId="email">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
