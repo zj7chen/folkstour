@@ -37,6 +37,7 @@ function LoginPage() {
               signingUp: false,
             }}
             onSubmit={async ({ signingUp, email, password, name, gender }) => {
+              setError("");
               try {
                 if (signingUp) {
                   await submit("/api/signup", {
@@ -71,7 +72,7 @@ function LoginPage() {
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <Alert variant="danger">{error}</Alert>
+                  {error && <Alert variant="danger">{error}</Alert>}
                   <Form.Group controlId="email">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
