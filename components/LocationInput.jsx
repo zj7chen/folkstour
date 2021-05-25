@@ -23,32 +23,22 @@ function cityToOption(value) {
   return { value, label: displayLocation(value) };
 }
 
-// props: {
-//   value: City
-//   onChange: (val: City) => void
-// }
-function LocationInput(props) {
+function LocationInput({ isMulti, value, onChange, ...props }) {
   const [handle, setHandle] = useState();
 
   return (
     <AsyncSelect
-      id={props.id}
-      name={props.name}
-      className={props.className}
       value={
-        props.isMulti
-          ? props.value.map((c) => cityToOption(c))
-          : props.value
-          ? cityToOption(props.value)
+        isMulti
+          ? value.map((c) => cityToOption(c))
+          : value
+          ? cityToOption(value)
           : null
       }
       onChange={(selected) =>
-        props.onChange(
-          props.isMulti ? selected.map((o) => o.value) : selected.value
-        )
+        onChange(isMulti ? selected.map((o) => o.value) : selected.value)
       }
-      placeholder={props.placeholder}
-      isMulti={props.isMulti}
+      isMulti={isMulti}
       cacheOptions
       loadOptions={(inputValue, callback) => {
         clearTimeout(handle);
@@ -60,6 +50,7 @@ function LocationInput(props) {
         );
       }}
       defaultOptions
+      {...props}
     />
   );
 }

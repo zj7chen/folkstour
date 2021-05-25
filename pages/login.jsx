@@ -47,11 +47,8 @@ function LoginPage() {
             {({
               handleSubmit,
               handleChange,
-              handleBlur,
               setFieldValue,
               values,
-              touched,
-              isValid,
               errors,
             }) => (
               <Form onSubmit={handleSubmit}>
@@ -70,6 +67,7 @@ function LoginPage() {
                       onChange={handleChange}
                       type="email"
                       placeholder="Enter email"
+                      autoFocus
                     />
                   </Form.Group>
 

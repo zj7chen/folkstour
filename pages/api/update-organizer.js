@@ -12,16 +12,13 @@ export default postApi(
   schema,
   async ({ userId: requestUserId, tripId }, req) => {
     const { userId: loginUserId } = getSession(req);
-    const { count } = await prisma.reservation.updateMany({
+    const { count } = await prisma.trip.updateMany({
       where: {
-        userId: requestUserId,
-        trip: {
-          id: tripId,
-          authorId: loginUserId,
-        },
+        id: tripId,
+        authorId: loginUserId,
       },
       data: {
-        status: "APPROVED",
+        authorId: requestUserId,
       },
     });
     if (count > 1) {

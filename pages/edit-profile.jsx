@@ -29,7 +29,10 @@ function EditProfilePage({ currentUser, user }) {
               .getCroppedCanvas()
               ?.toDataURL()
               ?.split(";base64,")?.[1];
-            await submit("/api/update-profile", { ...values, avatar });
+            await submit("/api/update-profile", {
+              ...values,
+              avatar,
+            });
           }}
         >
           {({ values, handleChange, handleSubmit, setFieldValue }) => (
@@ -84,6 +87,7 @@ function EditProfilePage({ currentUser, user }) {
                   onChange={(value) => {
                     setFieldValue("selfIntro", value);
                   }}
+                  placeholder="Tell us about yourself"
                 />
                 <Form.Text className="text-muted">
                   Maximum of 4000 characters

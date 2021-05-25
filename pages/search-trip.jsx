@@ -128,7 +128,9 @@ export const getServerSideProps = withSessionProps(
         },
         transports: {
           every: {
-            transport: { in: transports ? transports.split(",") : undefined },
+            transport: {
+              in: transports ? transports.split(",") : undefined,
+            },
           },
         },
         expectedExpense: {

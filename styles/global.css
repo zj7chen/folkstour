@@ -1,6 +1,10 @@
+/* bootstrap */
+
 .card-body > p:last-child {
   margin-bottom: 0;
 }
+
+/* custom */
 
 .card-list > section:not(:last-child) {
   margin-bottom: 1.5rem;
@@ -62,6 +66,7 @@
   vertical-align: top;
   width: 1.2em;
   height: 1.2em;
+  fill: currentColor;
 }
 
 .inline-icon > svg:not(:last-child) {

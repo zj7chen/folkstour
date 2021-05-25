@@ -1,10 +1,20 @@
 import bcrypt from "bcrypt";
+import { GENDERS } from "client/choices";
+import { nameSchema, passwordSchema, yup } from "client/validate";
+import { ClientError, postApi } from "server/api";
 import prisma from "server/prisma";
 import { setSession } from "server/session";
 
-async function handler(req, res) {
-  if (req.method === "POST") {
-    const { email, password, name, gender } = req.body;
+const schema = yup.object().shape({
+  email: yup.string().required().email(),
+  password: passwordSchema.required(),
+  name: nameSchema.required(),
+  gender: yup.mixed().required().oneOf(Object.keys(GENDERS)),
+});
+
+export default postApi(
+  schema,
+  async ({ email, password, name, gender }, req, res) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(password, salt);
@@ -20,15 +30,10 @@ async function handler(req, res) {
       });
     } catch (error) {
       console.log("Error creating new user:", error);
-      res.status(404).json({ message: error.message });
-      return;
+      // TODO: only throw ClientError if email is dup
+      throw new ClientError(400, error.message);
     }
     console.log("Successfully created new user:", user.id);
     setSession(res, user.id);
-    res.json({});
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
   }
-}
-
-export default handler;
+);

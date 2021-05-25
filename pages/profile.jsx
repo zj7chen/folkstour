@@ -1,6 +1,7 @@
 import Avatar from "components/Avatar";
 import Female from "components/icons/Female";
 import Male from "components/icons/Male";
+import MarkdownViewer from "components/MarkdownViewer";
 import StickyLayout from "components/StickyLayout";
 import TripCard from "components/TripCard";
 import TripFromTo from "components/TripFromTo";
@@ -30,21 +31,7 @@ function ProfilePage({ currentUser, user }) {
           <section>
             <h2>Intro</h2>
             <Card body>
-              <ReactMarkdown
-                allowedElements={[
-                  "strong",
-                  "em",
-                  "ul",
-                  "ol",
-                  "code",
-                  "blockquote",
-                  "li",
-                  "p",
-                ]}
-                skipHtml
-              >
-                {user.selfIntro}
-              </ReactMarkdown>
+              <MarkdownViewer value={user.selfIntro} />
             </Card>
           </section>
 

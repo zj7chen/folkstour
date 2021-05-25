@@ -1,9 +1,12 @@
+import { tripSchema } from "client/validate";
+import { postApi } from "server/api";
 import prisma from "server/prisma";
-import { withApiUser } from "server/session";
+import { getSession } from "server/session";
 
-export default withApiUser(async (req, res, { userId }) => {
-  if (req.method === "POST") {
-    const {
+export default postApi(
+  tripSchema,
+  async (
+    {
       locations,
       dates,
       transports,
@@ -12,7 +15,10 @@ export default withApiUser(async (req, res, { userId }) => {
       teamSize,
       expense,
       gender,
-    } = req.body;
+    },
+    req
+  ) => {
+    const { userId } = getSession(req);
     const trip = await prisma.trip.create({
       data: {
         locations: {
@@ -23,8 +29,8 @@ export default withApiUser(async (req, res, { userId }) => {
             })),
           },
         },
-        tripBeginTime: new Date(dates.start + "T00:00:00.000Z"),
-        tripEndTime: new Date(dates.end + "T00:00:00.000Z"),
+        tripBeginTime: dates.start,
+        tripEndTime: dates.end,
         transports: {
           create: transports.map((transport) => ({ transport })),
         },
@@ -42,9 +48,7 @@ export default withApiUser(async (req, res, { userId }) => {
         },
       },
     });
-    console.log(`Created trip ${id}`);
-    res.json({ id: trip.id });
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
+    console.log("Created trip:", trip.id);
+    return { id: trip.id };
   }
-});
+);

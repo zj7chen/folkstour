@@ -1,5 +1,6 @@
 import { useState } from "react";
 import RichTextEditor from "react-rte";
+import styles from "./MarkdownEditor.module.css";
 
 const toolbarConfig = {
   display: ["INLINE_STYLE_BUTTONS", "BLOCK_TYPE_BUTTONS", "HISTORY_BUTTONS"],
@@ -15,17 +16,19 @@ const toolbarConfig = {
   ],
 };
 
-function MarkdownEditor({ initialValue, onChange }) {
+function MarkdownEditor({ initialValue, onChange, placeholder }) {
   const [value, setValue] = useState(() =>
     RichTextEditor.createValueFromString(initialValue, "markdown")
   );
   return (
     <RichTextEditor
+      className={styles.editor}
       value={value}
       onChange={(value) => {
         setValue(value);
         onChange(value.toString("markdown"));
       }}
+      placeholder={placeholder}
       toolbarConfig={toolbarConfig}
     />
   );
