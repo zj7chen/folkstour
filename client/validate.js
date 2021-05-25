@@ -51,18 +51,16 @@ export const loginSchema = yup.object().shape({
 export const loginSignupSchema = yup.object().shape({
   email: yup.string().required().email(),
   password: passwordSchema.required(),
-  confirmPass: yup
-    .mixed()
-    .when("signingUp", {
-      is: true,
-      then: passwordSchema
-        .required()
-        .test(
-          "match-password",
-          "Passwords do not match",
-          (value, testContext) => value === testContext.parent.password
-        ),
-    }),
+  confirmPass: yup.mixed().when("signingUp", {
+    is: true,
+    then: passwordSchema
+      .required()
+      .test(
+        "match-password",
+        "Passwords do not match",
+        (value, testContext) => value === testContext.parent.password
+      ),
+  }),
   name: yup
     .mixed()
     .when("signingUp", { is: true, then: nameSchema.required() }),
@@ -70,6 +68,7 @@ export const loginSignupSchema = yup.object().shape({
     .mixed()
     .when("signingUp", { is: true, then: genderSchema.required() }),
   signingUp: yup.boolean().required(),
+  remember: yup.boolean().required(),
 });
 
 export const tripSchema = yup.object().shape({

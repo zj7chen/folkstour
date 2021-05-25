@@ -31,8 +31,16 @@ function LoginPage() {
               name: "",
               gender: "",
               signingUp: false,
+              remember: false,
             }}
-            onSubmit={async ({ signingUp, email, password, name, gender }) => {
+            onSubmit={async ({
+              signingUp,
+              email,
+              password,
+              name,
+              gender,
+              remember,
+            }) => {
               setError("");
               try {
                 if (signingUp) {
@@ -41,9 +49,10 @@ function LoginPage() {
                     password,
                     name,
                     gender,
+                    remember,
                   });
                 } else {
-                  await submit("/api/login", { email, password });
+                  await submit("/api/login", { email, password, remember });
                 }
               } catch (e) {
                 setError("Incorrect email or password, please try again");
@@ -102,7 +111,7 @@ function LoginPage() {
                     </Form.Control.Feedback>
                   </Form.Group>
 
-                  {values.signingUp ? (
+                  {values.signingUp && (
                     <>
                       <Form.Group controlId="confirmPass">
                         <Form.Label>Confirm Password</Form.Label>
@@ -167,11 +176,15 @@ function LoginPage() {
                         </Feedback>
                       </Form.Group>
                     </>
-                  ) : (
-                    <Form.Group controlId="remember">
-                      <Form.Check type="checkbox" label="Remember me" />
-                    </Form.Group>
                   )}
+                  <Form.Group controlId="remember">
+                    <Form.Check
+                      type="checkbox"
+                      label="Remember me"
+                      checked={values.remember}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button

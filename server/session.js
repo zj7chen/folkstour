@@ -1,3 +1,4 @@
+import { genderSchema } from "client/validate";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import prisma from "server/prisma";
@@ -6,10 +7,11 @@ import { ClientError } from "./api";
 const PRIVATE_KEY = fs.readFileSync("private.key");
 const PUBLIC_KEY = fs.readFileSync("public.pem");
 
-const COOKIE_OPTIONS =
-  process.env.NODE_ENV === "development"
-    ? "; HttpOnly; Path=/"
-    : "; HttpOnly; Path=/; Secure";
+const COOKIE_OPTIONS = [
+  "HttpOnly",
+  "Path=/",
+  ...(process.env.NODE_ENV === "production" ? ["Secure"] : []),
+];
 
 export function getSession(req, { optional } = {}) {
   const token = req.cookies.session || "";
@@ -24,7 +26,7 @@ export function getSession(req, { optional } = {}) {
   return jwt.verify(token, PUBLIC_KEY, { algorithms: ["RS256"] });
 }
 
-export function setSession(res, userId) {
+export function setSession(res, userId, { remember }) {
   const maxAge = 60 * 60 * 24 * 5;
   const token = jwt.sign({ userId }, PRIVATE_KEY, {
     algorithm: "RS256",
@@ -32,14 +34,22 @@ export function setSession(res, userId) {
   });
   res.setHeader(
     "Set-Cookie",
-    `session=${token}; Max-Age=${maxAge}${COOKIE_OPTIONS}`
+    [
+      `session=${token}`,
+      ...COOKIE_OPTIONS,
+      ...(remember ? [`Max-Age=${maxAge}`] : []),
+    ].join("; ")
   );
 }
 
 export function clearSession(res) {
   res.setHeader(
     "Set-Cookie",
-    `session=; Expires=Thu, 01 Jan 1970 00:00:00 GMT${COOKIE_OPTIONS}`
+    [
+      "session=",
+      ...COOKIE_OPTIONS,
+      "Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    ].join("; ")
   );
 }
 

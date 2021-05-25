@@ -14,7 +14,7 @@ const schema = yup.object().shape({
 
 export default postApi(
   schema,
-  async ({ email, password, name, gender }, req, res) => {
+  async ({ email, password, name, gender, remember }, req, res) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hash = await bcrypt.hash(password, salt);
@@ -34,6 +34,6 @@ export default postApi(
       throw new ClientError(400, error.message);
     }
     console.log("Successfully created new user:", user.id);
-    setSession(res, user.id);
+    setSession(res, user.id, { remember });
   }
 );
