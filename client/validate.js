@@ -1,4 +1,9 @@
-import { GENDER_REQUIREMENTS, TEAM_SIZES, TRANSPORTS } from "client/choices";
+import {
+  GENDERS,
+  GENDER_REQUIREMENTS,
+  TEAM_SIZES,
+  TRANSPORTS,
+} from "client/choices";
 import * as yup from "yup";
 
 export { yup };
@@ -23,6 +28,12 @@ export const dateSchema = yup.mixed().transform(function (value) {
 
 export const nameSchema = yup.string().max(40);
 
+export const genderSchema = yup.mixed().oneOf(Object.keys(GENDERS));
+
+export const genderRequirementSchema = yup
+  .mixed()
+  .oneOf(Object.keys(GENDER_REQUIREMENTS));
+
 // TODO: check ascii to ensure 76-byte limit
 export const passwordSchema = yup.string().max(76);
 
@@ -31,6 +42,35 @@ export const selfIntroSchema = yup.string().max(4000);
 export const tripTitleSchema = yup.string().max(190);
 
 export const tripDescriptionSchema = yup.string().max(4000);
+
+export const loginSchema = yup.object().shape({
+  email: yup.string().required().email(),
+  password: passwordSchema.required(),
+});
+
+export const loginSignupSchema = yup.object().shape({
+  email: yup.string().required().email(),
+  password: passwordSchema.required(),
+  confirmPass: yup
+    .mixed()
+    .when("signingUp", {
+      is: true,
+      then: passwordSchema
+        .required()
+        .test(
+          "match-password",
+          "Passwords do not match",
+          (value, testContext) => value === testContext.parent.password
+        ),
+    }),
+  name: yup
+    .mixed()
+    .when("signingUp", { is: true, then: nameSchema.required() }),
+  gender: yup
+    .mixed()
+    .when("signingUp", { is: true, then: genderSchema.required() }),
+  signingUp: yup.boolean().required(),
+});
 
 export const tripSchema = yup.object().shape({
   locations: yup
@@ -58,5 +98,5 @@ export const tripSchema = yup.object().shape({
   description: tripDescriptionSchema,
   teamSize: yup.mixed().required().oneOf(Object.keys(TEAM_SIZES)),
   expense: yup.number().required().positive(),
-  gender: yup.mixed().required().oneOf(Object.keys(GENDER_REQUIREMENTS)),
+  gender: genderRequirementSchema.required(),
 });
