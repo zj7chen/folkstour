@@ -19,7 +19,7 @@ export default postApi(schema, async ({ email, password }, req, res) => {
       email,
     },
   });
-  if (!(await bcrypt.compare(password, user.password))) {
+  if (user === null || !(await bcrypt.compare(password, user.password))) {
     throw new ClientError(401, "Unauthorized");
   }
 
