@@ -75,6 +75,9 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
         selfIntro: true,
         gender: true,
         reservations: {
+          where: {
+            status: "APPROVED",
+          },
           orderBy: {
             trip: {
               title: "asc",
@@ -102,6 +105,9 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
                   },
                 },
                 reservations: {
+                  where: {
+                    status: "APPROVED",
+                  },
                   orderBy: {
                     user: {
                       name: "asc",
