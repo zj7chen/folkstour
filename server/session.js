@@ -1,6 +1,6 @@
 import { genderSchema } from "client/validate";
 import fs from "fs";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import prisma from "server/prisma";
 import { ClientError } from "./api";
 
@@ -15,15 +15,22 @@ const COOKIE_OPTIONS = [
 
 export function getSession(req, { optional } = {}) {
   const token = req.cookies.session || "";
-  if (!token) {
-    if (optional) {
-      return null;
-    } else {
-      throw new ClientError(401, "Not logged in");
+  let session = null;
+  if (token) {
+    try {
+      session = jwt.verify(token, PUBLIC_KEY, { algorithms: ["RS256"] });
+    } catch (e) {
+      if (e instanceof TokenExpiredError) {
+        // ignore
+      } else {
+        throw e;
+      }
     }
   }
-  // TODO: catch and rethrow with ClientError
-  return jwt.verify(token, PUBLIC_KEY, { algorithms: ["RS256"] });
+  if (!session && !optional) {
+    throw new ClientError(401, "Not logged in");
+  }
+  return session;
 }
 
 export function setSession(res, userId, { remember }) {
