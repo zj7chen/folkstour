@@ -6,6 +6,7 @@ import StickyLayout from "components/StickyLayout";
 import TripCard from "components/TripCard";
 import TripFromTo from "components/TripFromTo";
 import Link from "next/link";
+import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import prisma from "server/prisma";
 import { withSessionProps } from "server/session";
@@ -20,10 +21,13 @@ function ProfilePage({ currentUser, user }) {
       side={
         <div className={styles.userProfile}>
           <Avatar hash={user.avatarHash} />
-          <div className={`${styles.userIdentity} ${genderClass}`}>
+          <div className={`${styles.userIdentity} ${genderClass} mb-4`}>
             <h1>{user.name}</h1>
             <Gender />
           </div>
+          <Link href="/edit-profile" passHref>
+            <Button variant="outline-secondary">Edit Profile</Button>
+          </Link>
         </div>
       }
       main={

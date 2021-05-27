@@ -20,7 +20,8 @@ function EditProfilePage({ currentUser, user }) {
   return (
     <div>
       <NavBar currentUser={currentUser} />
-      <Container fluid="xl">
+      <Container fluid="xl" className="pt-3">
+        <h1>Edit Profile</h1>
         <Formik
           initialValues={user}
           onSubmit={async (values) => {
@@ -38,12 +39,6 @@ function EditProfilePage({ currentUser, user }) {
           {({ values, handleChange, handleSubmit, setFieldValue }) => (
             <Form onSubmit={handleSubmit}>
               <Form.Group>
-                <Cropper
-                  // Cropper.js options
-                  initialAspectRatio={1 / 1}
-                  guides={false}
-                  ref={cropperRef}
-                />
                 <Form.File
                   id="avatar"
                   name="avatar"
@@ -57,6 +52,12 @@ function EditProfilePage({ currentUser, user }) {
                     const cropper = cropperRef.current.cropper;
                     cropper.replace(reader.result);
                   }}
+                />
+                <Cropper
+                  // Cropper.js options
+                  initialAspectRatio={1 / 1}
+                  guides={false}
+                  ref={cropperRef}
                 />
               </Form.Group>
               <Form.Group controlId="gender">
