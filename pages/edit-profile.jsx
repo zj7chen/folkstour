@@ -28,7 +28,10 @@ function EditProfilePage({ currentUser, user }) {
       <Container fluid="xl" className="pt-3">
         <h1>Edit Profile</h1>
         <Formik
-          initialValues={user}
+          initialValues={{
+            gender: user.gender,
+            selfIntro: user.selfIntro,
+          }}
           onSubmit={async (values) => {
             const cropper = cropperRef.current?.cropper;
             const avatar = avatarUrl
