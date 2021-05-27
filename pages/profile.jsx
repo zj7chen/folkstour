@@ -5,8 +5,8 @@ import MarkdownViewer from "components/MarkdownViewer";
 import StickyLayout from "components/StickyLayout";
 import TripCard from "components/TripCard";
 import TripFromTo from "components/TripFromTo";
+import Link from "next/link";
 import Card from "react-bootstrap/Card";
-import ReactMarkdown from "react-markdown";
 import prisma from "server/prisma";
 import { withSessionProps } from "server/session";
 import styles from "./profile.module.css";
@@ -50,7 +50,11 @@ function ProfilePage({ currentUser, user }) {
                 <ul className="horizontal-group group-size-avatar">
                   {trip.reservations.map(({ user: { id, avatarHash } }) => (
                     <li key={id}>
-                      <Avatar hash={avatarHash} />
+                      <Link href={`/profile?id=${id}`}>
+                        <a>
+                          <Avatar hash={avatarHash} />
+                        </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
