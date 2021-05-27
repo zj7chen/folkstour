@@ -27,10 +27,11 @@ export function getSession(req, { optional } = {}) {
 }
 
 export function setSession(res, userId, { remember }) {
+  // 5 days
   const maxAge = 60 * 60 * 24 * 5;
   const token = jwt.sign({ userId }, PRIVATE_KEY, {
     algorithm: "RS256",
-    expiresIn: maxAge * 1000,
+    expiresIn: maxAge,
   });
   res.setHeader(
     "Set-Cookie",
