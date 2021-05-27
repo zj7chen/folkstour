@@ -27,9 +27,12 @@ function NavBar({ currentUser, landing }) {
         {!landing && (
           <div className={styles.content}>
             <LocationSearch styles={searchStyles} />
-            <Nav>
+            <Nav activeKey={router.pathname}>
               <Link href="/create-trip" passHref>
                 <Nav.Link>Create Trip</Nav.Link>
+              </Link>
+              <Link href="/search-trip" passHref>
+                <Nav.Link>Search Trips</Nav.Link>
               </Link>
             </Nav>
           </div>
