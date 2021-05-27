@@ -1,8 +1,7 @@
-import { genderSchema } from "client/validate";
 import fs from "fs";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
+import { ClientError } from "server/api";
 import prisma from "server/prisma";
-import { ClientError } from "./api";
 
 const PRIVATE_KEY = fs.readFileSync("private.key");
 const PUBLIC_KEY = fs.readFileSync("public.pem");
