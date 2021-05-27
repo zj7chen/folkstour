@@ -54,10 +54,18 @@ function EditProfilePage({ currentUser, user }) {
                   }}
                 />
                 <Cropper
-                  // Cropper.js options
-                  initialAspectRatio={1 / 1}
-                  guides={false}
                   ref={cropperRef}
+                  style={{ height: "25rem" }}
+                  // Cropper.js options
+                  viewMode={1}
+                  dragMode="move"
+                  aspectRatio={1 / 1}
+                  restore={false}
+                  guides={false}
+                  autoCropArea={1}
+                  cropBoxMovable={false}
+                  cropBoxResizable={false}
+                  toggleDragModeOnDblclick={false}
                 />
               </Form.Group>
               <Form.Group controlId="gender">
