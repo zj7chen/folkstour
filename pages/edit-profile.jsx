@@ -1,22 +1,27 @@
 import { GENDERS } from "client/choices";
 import submit from "client/submit";
+import Avatar from "components/Avatar";
 import NavBar from "components/NavBar";
 import { Formik } from "formik";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useRouter } from "next/router";
+import { useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Cropper from "react-cropper";
 import prisma from "server/prisma";
 import { withSessionProps } from "server/session";
+import styles from "./edit-profile.module.css";
 
 const MarkdownEditor = dynamic(() => import("components/MarkdownEditor"), {
   ssr: false,
 });
 
 function EditProfilePage({ currentUser, user }) {
+  const router = useRouter();
   const cropperRef = useRef(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   return (
     <div>
       <NavBar currentUser={currentUser} />
@@ -25,15 +30,15 @@ function EditProfilePage({ currentUser, user }) {
         <Formik
           initialValues={user}
           onSubmit={async (values) => {
-            const cropper = cropperRef.current.cropper;
-            const avatar = cropper
-              .getCroppedCanvas()
-              ?.toDataURL()
-              ?.split(";base64,")?.[1];
+            const cropper = cropperRef.current?.cropper;
+            const avatar = avatarUrl
+              ? cropper?.getCroppedCanvas()?.toDataURL()?.split(";base64,")?.[1]
+              : undefined;
             await submit("/api/update-profile", {
               ...values,
               avatar,
             });
+            router.replace({ pathname: "/profile", query: { id: user.id } });
           }}
         >
           {({ values, handleChange, handleSubmit, setFieldValue }) => (
@@ -44,29 +49,45 @@ function EditProfilePage({ currentUser, user }) {
                   name="avatar"
                   label="Avatar"
                   onChange={async (e) => {
-                    const { name, files } = e.currentTarget;
+                    const { files } = e.currentTarget;
                     if (files.length === 0) return;
                     const reader = new FileReader();
                     reader.readAsDataURL(files[0]);
                     await new Promise((res) => (reader.onloadend = res));
-                    const cropper = cropperRef.current.cropper;
-                    cropper.replace(reader.result);
+                    setAvatarUrl(reader.result);
                   }}
                 />
-                <Cropper
-                  ref={cropperRef}
-                  style={{ height: "25rem" }}
-                  // Cropper.js options
-                  viewMode={1}
-                  dragMode="move"
-                  aspectRatio={1 / 1}
-                  restore={false}
-                  guides={false}
-                  autoCropArea={1}
-                  cropBoxMovable={false}
-                  cropBoxResizable={false}
-                  toggleDragModeOnDblclick={false}
-                />
+                {avatarUrl ? (
+                  <>
+                    <Cropper
+                      ref={cropperRef}
+                      className={styles.cropper}
+                      src={avatarUrl}
+                      // Cropper.js options
+                      viewMode={1}
+                      dragMode="move"
+                      aspectRatio={1 / 1}
+                      restore={false}
+                      guides={false}
+                      autoCropArea={1}
+                      cropBoxMovable={false}
+                      cropBoxResizable={false}
+                      toggleDragModeOnDblclick={false}
+                    />
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setAvatarUrl(null);
+                      }}
+                    >
+                      Revert to original
+                    </Button>
+                  </>
+                ) : (
+                  <div className={styles.avatar}>
+                    <Avatar hash={user.avatarHash} />
+                  </div>
+                )}
               </Form.Group>
               <Form.Group controlId="gender">
                 <Form.Label>Gender</Form.Label>
@@ -119,6 +140,7 @@ export const getServerSideProps = withSessionProps(
       select: {
         gender: true,
         selfIntro: true,
+        avatarHash: true,
       },
       where: {
         id: userId,
@@ -126,7 +148,10 @@ export const getServerSideProps = withSessionProps(
     });
     return {
       props: {
-        user,
+        user: {
+          ...user,
+          id: userId,
+        },
       },
     };
   }
