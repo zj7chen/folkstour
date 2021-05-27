@@ -7,7 +7,12 @@ function CreateTripPage({ currentUser }) {
     <StickyLayout
       currentUser={currentUser}
       side={<p>Useful tips</p>}
-      main={<CreateTripForm />}
+      main={
+        <>
+          <h1>Create a New Trip</h1>
+          <CreateTripForm />
+        </>
+      }
       flipped
     />
   );
