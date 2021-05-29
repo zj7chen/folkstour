@@ -1,20 +1,20 @@
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { TEAM_SIZES } from "client/choices";
 
-function TripCapacity({ teamSize, reservations }) {
+function TripCapacity({ teamSize, numParticipants }) {
   const totalTeamSize = TEAM_SIZES[teamSize].limit;
   return (
     <ProgressBar
       striped
       variant={
-        reservations === totalTeamSize
+        numParticipants === totalTeamSize
           ? "danger"
-          : reservations > totalTeamSize / 2
+          : numParticipants > totalTeamSize / 2
           ? "warning"
           : "success"
       }
-      now={(reservations / totalTeamSize) * 100}
-      label={`${reservations} / ${totalTeamSize}`}
+      now={(numParticipants / totalTeamSize) * 100}
+      label={`${numParticipants} / ${totalTeamSize}`}
     />
   );
 }

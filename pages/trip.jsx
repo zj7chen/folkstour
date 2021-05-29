@@ -73,11 +73,11 @@ function TripPage({ currentUser, trip }) {
   const router = useRouter();
   const [confirmProps, setConfirmProps] = useState();
 
-  function isAuthor(reservation) {
-    return reservation.user.id === trip.authorId;
+  function isAuthor(participation) {
+    return participation.user.id === trip.authorId;
   }
 
-  const author = trip.reservations.find(isAuthor).user;
+  const author = trip.participations.find(isAuthor).user;
   return (
     <>
       <ConfirmModal
@@ -181,8 +181,8 @@ function TripPage({ currentUser, trip }) {
               <h2>Capacity</h2>
               <TripCapacity
                 teamSize={trip.teamSize}
-                reservations={
-                  trip.reservations.filter((r) => r.status === "APPROVED")
+                numParticipants={
+                  trip.participations.filter((r) => r.status === "APPROVED")
                     .length
                 }
               />
@@ -199,7 +199,7 @@ function TripPage({ currentUser, trip }) {
             <UserList
               title="Other Participants"
               userType="other participants"
-              users={trip.reservations
+              users={trip.participations
                 .filter((r) => !isAuthor(r) && r.status === "APPROVED")
                 .map(({ user }) => user)}
               actions={(user) =>
@@ -266,7 +266,7 @@ function TripPage({ currentUser, trip }) {
               <UserList
                 title="Pending Requests"
                 userType="pending requests"
-                users={trip.reservations
+                users={trip.participations
                   .filter((r) => r.status === "PENDING")
                   .map(({ user }) => user)}
                 actions={(user) => (
@@ -322,7 +322,7 @@ export const getServerSideProps = withSessionProps(
               location: true,
             },
           },
-          reservations: {
+          participations: {
             select: {
               user: {
                 select: {
@@ -351,7 +351,7 @@ export const getServerSideProps = withSessionProps(
       transports,
       locations,
       expectedExpense,
-      reservations,
+      participations,
       ...rest
     } = trip;
     const userId = session?.userId;
@@ -367,12 +367,12 @@ export const getServerSideProps = withSessionProps(
           locations: locations.map(({ location }) => location),
           expectedExpense: expectedExpense.toJSON(),
           authoredByCurrentUser: authorId === userId,
-          reservations:
+          participations:
             authorId === userId
-              ? reservations
-              : reservations.filter((r) => r.status == "APPROVED"),
+              ? participations
+              : participations.filter((r) => r.status == "APPROVED"),
           reservationStatus:
-            reservations.find((r) => r.user.id === userId)?.status ??
+            participations.find((r) => r.user.id === userId)?.status ??
             "NOT_REQUESTED",
         },
       },

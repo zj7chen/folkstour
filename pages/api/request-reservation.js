@@ -10,7 +10,7 @@ const schema = yup.object().shape({
 export default postApi(schema, async ({ tripId }, req) => {
   const { userId } = getSession(req);
   try {
-    await prisma.reservation.create({
+    await prisma.participation.create({
       data: {
         userId,
         tripId,

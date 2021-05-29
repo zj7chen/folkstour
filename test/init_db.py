@@ -12,7 +12,7 @@ host = 'http://localhost:3000'
 
 print('clearing database')
 tables = [
-    'Reservation',
+    'Participation',
     'TripLocation',
     'TripTransport',
     'Trip',

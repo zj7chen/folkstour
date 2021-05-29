@@ -41,7 +41,7 @@ function ProfilePage({ currentUser, user }) {
 
           <section>
             <h2>Participating Trips</h2>
-            {user.reservations.map(({ trip }) => (
+            {user.participations.map(({ trip }) => (
               <TripCard key={trip.id} trip={trip}>
                 <TripFromTo
                   startLocation={trip.startLocation}
@@ -52,7 +52,7 @@ function ProfilePage({ currentUser, user }) {
                 />
                 <div className="mb-2" />
                 <ul className="horizontal-group group-size-avatar">
-                  {trip.reservations.map(({ user: { id, avatarHash } }) => (
+                  {trip.participations.map(({ user: { id, avatarHash } }) => (
                     <li key={id}>
                       <Link href={`/profile?id=${id}`}>
                         <a>
@@ -82,7 +82,7 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
         avatarHash: true,
         selfIntro: true,
         gender: true,
-        reservations: {
+        participations: {
           where: {
             status: "APPROVED",
           },
@@ -112,7 +112,7 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
                     location: true,
                   },
                 },
-                reservations: {
+                participations: {
                   where: {
                     status: "APPROVED",
                   },
@@ -143,12 +143,12 @@ export const getServerSideProps = withSessionProps(async ({ query }) => {
   if (!user) {
     return { notFound: true };
   }
-  const { reservations, ...rest } = user;
+  const { participations, ...rest } = user;
   return {
     props: {
       user: {
         ...rest,
-        reservations: reservations.map(
+        participations: participations.map(
           ({
             trip: {
               tripBeginTime,

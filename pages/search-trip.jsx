@@ -25,7 +25,7 @@ function SearchTripPage({ currentUser, trips }) {
             <div>Capacity:</div>
             <TripCapacity
               teamSize={trip.teamSize}
-              reservations={trip.numReservations}
+              numParticipants={trip.numParticipants}
             />
           </div>
         </TripCard>
@@ -83,7 +83,7 @@ export const getServerSideProps = withSessionProps(
             location: true,
           },
         },
-        reservations: {
+        participations: {
           where: {
             status: "APPROVED",
           },
@@ -146,7 +146,7 @@ export const getServerSideProps = withSessionProps(
             tripEndTime,
             transports,
             locations,
-            reservations,
+            participations,
             ...rest
           }) => ({
             ...rest,
@@ -156,7 +156,7 @@ export const getServerSideProps = withSessionProps(
             startLocation: locations[0].location,
             endLocation: locations[locations.length - 1].location,
             numLocations: locations.length,
-            numReservations: reservations.length,
+            numParticipants: participations.length,
           })
         ),
       },

@@ -40,7 +40,7 @@ export default postApi(
         expectedExpense: expense,
         genderRequirement: gender,
         author: { connect: { id: userId } },
-        reservations: {
+        participations: {
           create: {
             userId,
             status: "APPROVED",

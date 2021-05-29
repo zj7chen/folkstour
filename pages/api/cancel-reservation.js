@@ -12,7 +12,7 @@ export default postApi(
   schema,
   async ({ userId: requestUserId, tripId }, req) => {
     const { userId: loginUserId } = getSession(req);
-    const { count } = await prisma.reservation.deleteMany({
+    const { count } = await prisma.participation.deleteMany({
       where: {
         userId: requestUserId ?? loginUserId,
         tripId,

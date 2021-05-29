@@ -24,7 +24,7 @@ function Dashboard({ currentUser, trips }) {
                 title,
                 tripBeginTime,
                 authorId,
-                numReservations,
+                numPendingRequests,
                 reservationStatus,
               }) => (
                 <TimelineItem
@@ -36,8 +36,8 @@ function Dashboard({ currentUser, trips }) {
                       <a>{title}</a>
                     </Link>
                     <div>
-                      {numReservations
-                        ? `${numReservations} pending requests`
+                      {numPendingRequests
+                        ? `${numPendingRequests} pending requests`
                         : ""}
                     </div>
                   </div>
@@ -90,7 +90,7 @@ export const getServerSideProps = withSessionProps(
         title: true,
         tripBeginTime: true,
         authorId: true,
-        reservations: {
+        participations: {
           select: {
             userId: true,
             status: true,
@@ -104,7 +104,7 @@ export const getServerSideProps = withSessionProps(
             authorId: {
               not: userId,
             },
-            reservations: {
+            participations: {
               some: {
                 userId,
               },
@@ -117,14 +117,14 @@ export const getServerSideProps = withSessionProps(
     return {
       props: {
         trips: trips.map(
-          ({ tripBeginTime, reservations, authorId, ...rest }) => ({
+          ({ tripBeginTime, participations, authorId, ...rest }) => ({
             ...rest,
             tripBeginTime: tripBeginTime.toISOString(),
-            reservationStatus: reservations.find((r) => r.userId === userId)
+            reservationStatus: participations.find((r) => r.userId === userId)
               .status,
-            numReservations:
+            numPendingRequests:
               authorId === userId
-                ? reservations.filter((r) => r.status === "PENDING").length
+                ? participations.filter((r) => r.status === "PENDING").length
                 : null,
             authorId,
           })
