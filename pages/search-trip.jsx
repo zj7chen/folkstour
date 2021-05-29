@@ -1,3 +1,4 @@
+import { searchTripSchema } from "client/validate";
 import SearchTripForm from "components/SearchTripForm";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
@@ -37,16 +38,32 @@ function SearchTripPage({ currentUser, trips }) {
 // context stores query and other stuff
 export const getServerSideProps = withSessionProps(
   async ({ query, session }) => {
-    // e.g. const { title: t } = context.query
-    // 是取 context.query 中 key 为 title 的 property 并赋值到 变量 t 上
-    const { title, location, dates, teamsize, transports, expense } = query;
-    let start, end;
-    if (dates) {
-      [start, end] = dates
-        .split(",")
-        .map((d) => new Date(d + "T00:00:00.000Z"));
-      start = new Date(start.getTime() - 30 * 24 * 60 * 60 * 1000);
-      end = new Date(end.getTime() + 30 * 24 * 60 * 60 * 1000);
+    let locationJson;
+    if (query.location) {
+      try {
+        locationJson = JSON.parse(query.location);
+      } catch (e) {
+        return { notFound: true };
+      }
+    }
+    let { title, location, dates, teamsize, transports, expense } =
+      await searchTripSchema.validate({
+        title: query.title,
+        location: locationJson,
+        dates: query.dates ? query.dates.split(",") : [undefined, undefined],
+        teamsize: query.teamsize ? query.teamsize.split(",") : undefined,
+        transports: query.transports ? query.transports.split(",") : undefined,
+        expense: query.expense || undefined,
+      });
+    // 30 days
+    const margin = 30 * 24 * 60 * 60 * 1000;
+    let start;
+    if (dates.start) {
+      start = new Date(dates.start.getTime() - margin);
+    }
+    let end;
+    if (dates.end) {
+      end = new Date(dates.end.getTime() + margin);
     }
     let user = null;
     if (session) {
@@ -99,7 +116,7 @@ export const getServerSideProps = withSessionProps(
         locations: {
           some: {
             location: {
-              equals: location ? JSON.parse(location) : undefined,
+              equals: location,
             },
           },
         },
@@ -124,17 +141,17 @@ export const getServerSideProps = withSessionProps(
           },
         ],
         teamSize: {
-          in: teamsize ? teamsize.split(",") : undefined,
+          in: teamsize,
         },
         transports: {
           every: {
             transport: {
-              in: transports ? transports.split(",") : undefined,
+              in: transports,
             },
           },
         },
         expectedExpense: {
-          lte: expense ? parseFloat(expense) : undefined,
+          lte: expense,
         },
       },
     });

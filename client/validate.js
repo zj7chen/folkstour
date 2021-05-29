@@ -1,3 +1,4 @@
+import countries from "cities.json";
 import {
   GENDERS,
   GENDER_REQUIREMENTS,
@@ -12,13 +13,24 @@ export const tripIdSchema = yup.number().integer();
 
 export const userIdSchema = yup.number().integer();
 
-// TODO: verify it's in our location list
 // TODO: reject extra properties
-export const locationSchema = yup.object().shape({
-  country: yup.string().required(),
-  province: yup.string().required(),
-  city: yup.string().required(),
-});
+export const locationSchema = yup
+  .mixed()
+  .transform(function (value) {
+    return yup
+      .object()
+      .shape({
+        country: yup.string().required(),
+        province: yup.string().required(),
+        city: yup.string().required(),
+      })
+      .validateSync(value);
+  })
+  .test(
+    "city-exists",
+    "city does not exist",
+    (v) => !v || countries[v.country]?.[v.province]?.[v.city] !== undefined
+  );
 
 export const dateSchema = yup.mixed().transform(function (value) {
   if (!value) return null;
@@ -28,7 +40,13 @@ export const dateSchema = yup.mixed().transform(function (value) {
 
 export const nameSchema = yup.string().max(40);
 
+export const expenseSchema = yup.number().positive();
+
 export const genderSchema = yup.mixed().oneOf(Object.keys(GENDERS));
+
+export const teamSizeSchema = yup.mixed().oneOf(Object.keys(TEAM_SIZES));
+
+export const transportSchema = yup.mixed().oneOf(Object.keys(TRANSPORTS));
 
 export const genderRequirementSchema = yup
   .mixed()
@@ -91,11 +109,21 @@ export const tripSchema = yup.object().shape({
   transports: yup
     .array()
     .required()
-    .of(yup.mixed().oneOf(Object.keys(TRANSPORTS)))
+    .of(transportSchema)
     .min(1, "at least ${min} transport must be selected"),
   title: tripTitleSchema.required(),
   description: tripDescriptionSchema,
-  teamSize: yup.mixed().required().oneOf(Object.keys(TEAM_SIZES)),
-  expense: yup.number().required().positive(),
+  teamSize: teamSizeSchema.required(),
+  expense: expenseSchema.required(),
   gender: genderRequirementSchema.required(),
+});
+
+export const searchTripSchema = yup.object().shape({
+  title: tripTitleSchema,
+  location: locationSchema,
+  // TODO: verify start-before-end
+  dates: yup.array().of(dateSchema).length(2),
+  teamsize: yup.array().of(teamSizeSchema),
+  transports: yup.array().of(transportSchema),
+  expense: expenseSchema,
 });

@@ -2,6 +2,7 @@ import fs from "fs";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { ClientError } from "server/api";
 import prisma from "server/prisma";
+import { ValidationError } from "yup";
 
 const PRIVATE_KEY = fs.readFileSync("private.key");
 const PUBLIC_KEY = fs.readFileSync("public.pem");
@@ -63,7 +64,7 @@ export function clearSession(res) {
 export const withSessionProps =
   (f, { optional } = {}) =>
   async (context) => {
-    const { req, resolvedUrl } = context;
+    const { req, query, resolvedUrl } = context;
     const session = getSession(req, { optional: true });
 
     if (!optional && !session) {
@@ -73,7 +74,19 @@ export const withSessionProps =
       return { redirect: { destination, permanent: false } };
     }
 
-    const { props, ...rest } = await f({ ...context, session });
+    // reject duplicate query parameters
+    if (Object.values(query).some((v) => Array.isArray(v)))
+      return { notFound: true };
+    let output;
+    try {
+      output = await f({ ...context, session });
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        return { notFound: true };
+      }
+      throw e;
+    }
+    const { props, ...rest } = output;
 
     let currentUser = null;
     if (session) {
