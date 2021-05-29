@@ -46,7 +46,7 @@ function Dashboard({ currentUser, trips }) {
                       <Flag />
                       <span>Organizer</span>
                     </div>
-                  ) : reservationStatus === "APPROVAL" ? (
+                  ) : reservationStatus === "APPROVED" ? (
                     <div className="text-muted inline-icon">
                       <People />
                       <span>Participant</span>
