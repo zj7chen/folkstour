@@ -1,3 +1,4 @@
+import ArrowForwardOutline from "components/icons/ArrowForwardOutline";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import styles from "./DateInput.module.css";
@@ -20,7 +21,9 @@ function DateInput({ id, value, onChange, onBlur }) {
         onBlur={onBlur}
       />
       <div className={styles.separator}>
-        <span>⟶</span>
+        <span className="inline-icon">
+          <ArrowForwardOutline />
+        </span>
       </div>
       <Form.Control
         id={`${id}_end`}
