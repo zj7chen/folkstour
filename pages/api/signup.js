@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import bcrypt from "bcrypt";
 import { GENDERS } from "client/choices";
 import { nameSchema, passwordSchema, yup } from "client/validate";
@@ -28,10 +29,12 @@ export default postApi(
           gender,
         },
       });
-    } catch (error) {
-      console.log("Error creating new user:", error);
-      // TODO: only throw ClientError if email is dup
-      throw new ClientError(400, error.message);
+    } catch (e) {
+      // Unique constraint failed, i.e. user exists
+      if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+        throw new ClientError(409, "Already exists");
+      }
+      throw e;
     }
     console.log("Successfully created new user:", user.id);
     setSession(res, user.id, { remember });
