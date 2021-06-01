@@ -13,7 +13,6 @@ export const tripIdSchema = yup.number().integer();
 
 export const userIdSchema = yup.number().integer();
 
-// TODO: reject extra properties
 export const locationSchema = yup
   .mixed()
   .transform(function (value) {
@@ -24,6 +23,7 @@ export const locationSchema = yup
         province: yup.string().required(),
         city: yup.string().required(),
       })
+      .noUnknown()
       .validateSync(value);
   })
   .test(
