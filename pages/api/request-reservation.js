@@ -1,5 +1,5 @@
 import { tripIdSchema, yup } from "client/validate";
-import { postApi } from "server/api";
+import { ClientError, postApi } from "server/api";
 import prisma from "server/prisma";
 import { getSession } from "server/session";
 
@@ -9,17 +9,20 @@ const schema = yup.object().shape({
 
 export default postApi(schema, async ({ tripId }, req) => {
   const { userId } = getSession(req);
-  try {
-    await prisma.participation.create({
-      data: {
+  const { count } = await prisma.participation.createMany({
+    data: [
+      {
         userId,
         tripId,
         status: "PENDING",
       },
-    });
-  } catch (e) {
-    // TODO: find out exception type
-    console.log(e);
-    return;
+    ],
+    skipDuplicates: true,
+  });
+  if (count > 1) {
+    throw new Error("BUG: broken update logic");
+  }
+  if (count === 0) {
+    throw new ClientError(409, "Already exists");
   }
 });
