@@ -52,8 +52,10 @@ export const genderRequirementSchema = yup
   .mixed()
   .oneOf(Object.keys(GENDER_REQUIREMENTS));
 
-// TODO: check ascii to ensure 76-byte limit
-export const passwordSchema = yup.string().max(76);
+export const passwordSchema = yup
+  .string()
+  .matches(/[\x20-\x7e]+/)
+  .max(76);
 
 export const selfIntroSchema = yup.string().max(4000);
 
