@@ -121,7 +121,6 @@ export const tripSchema = yup.object().shape({
 export const searchTripSchema = yup.object().shape({
   title: tripTitleSchema,
   location: locationSchema,
-  // TODO: verify start-before-end
   dates: yup
     .array()
     .of(dateSchema)
