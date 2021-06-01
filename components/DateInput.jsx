@@ -10,6 +10,7 @@ function DateInput({ id, value, onChange, onBlur }) {
         id={`${id}_start`}
         type="date"
         value={start}
+        max={end}
         onChange={(e) =>
           onChange?.({
             start: e.currentTarget.value,
@@ -24,6 +25,7 @@ function DateInput({ id, value, onChange, onBlur }) {
       <Form.Control
         id={`${id}_end`}
         type="date"
+        min={start}
         value={end}
         onChange={(e) =>
           onChange?.({

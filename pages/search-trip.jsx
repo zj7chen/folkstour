@@ -50,20 +50,18 @@ export const getServerSideProps = withSessionProps(
       await searchTripSchema.validate({
         title: query.title,
         location: locationJson,
-        dates: query.dates ? query.dates.split(",") : [undefined, undefined],
+        dates: query.dates ? query.dates.split(",") : undefined,
         teamsize: query.teamsize ? query.teamsize.split(",") : undefined,
         transports: query.transports ? query.transports.split(",") : undefined,
         expense: query.expense || undefined,
       });
     // 30 days
     const margin = 30 * 24 * 60 * 60 * 1000;
-    let start;
-    if (dates.start) {
-      start = new Date(dates.start.getTime() - margin);
-    }
-    let end;
-    if (dates.end) {
-      end = new Date(dates.end.getTime() + margin);
+    let start, end;
+    if (dates) {
+      [start, end] = dates;
+      start = new Date(start.getTime() - margin);
+      end = new Date(end.getTime() + margin);
     }
     let user = null;
     if (session) {

@@ -122,7 +122,19 @@ export const searchTripSchema = yup.object().shape({
   title: tripTitleSchema,
   location: locationSchema,
   // TODO: verify start-before-end
-  dates: yup.array().of(dateSchema).length(2),
+  dates: yup
+    .array()
+    .of(dateSchema)
+    .length(2)
+    .test(
+      "start-before-end",
+      "end date must not be earlier than start date",
+      (dates) => {
+        if (!dates) return true;
+        const [start, end] = dates;
+        return start <= end;
+      }
+    ),
   teamsize: yup.array().of(teamSizeSchema),
   transports: yup.array().of(transportSchema),
   expense: expenseSchema,

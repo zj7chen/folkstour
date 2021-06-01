@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import ToggleButton from "react-bootstrap/ToggleButton";
-import LocationInput from "components/LocationInput";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import { useRouter } from "next/router";
-import DateInput from "components/DateInput";
 import { TEAM_SIZES, TRANSPORTS } from "client/choices";
+import DateInput from "components/DateInput";
+import LocationInput from "components/LocationInput";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Form from "react-bootstrap/Form";
 
 function useInput(state, f) {
   const [value, setValue] = useState(f(state));
@@ -21,7 +18,7 @@ function useInput(state, f) {
 
 // update dates [start, end]
 function parseDates(dates) {
-  if (!dates) return { start: null, end: null };
+  if (!dates) return { start: "", end: "" };
   const [start, end] = dates.split(",");
   return { start, end };
 }
@@ -82,9 +79,8 @@ function SearchTripForm(props) {
           value={dates}
           onChange={({ start, end }) => {
             setDates({ start, end });
-            if (!start || !end) return;
             update({
-              dates: [start, end].join(","),
+              dates: start && end ? [start, end].join(",") : "",
             });
           }}
         />
