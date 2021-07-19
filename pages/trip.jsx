@@ -78,6 +78,12 @@ function TripPage({ currentUser, trip }) {
   }
 
   const author = trip.participations.find(isAuthor).user;
+  const approvedParticipants = trip.participations
+    .filter((r) => !isAuthor(r) && r.status === "APPROVED")
+    .map(({ user }) => user);
+  const pendingParticipants = trip.participations
+    .filter((r) => r.status === "PENDING")
+    .map(({ user }) => user);
   return (
     <>
       <ConfirmModal
@@ -123,10 +129,36 @@ function TripPage({ currentUser, trip }) {
                       className="inline-icon"
                       variant="danger"
                       onClick={async () => {
-                        await submit("/api/cancel-reservation", {
-                          tripId: trip.id,
+                        console.log({
+                          trip,
+                          currentUser,
+                          approvedParticipants,
                         });
-                        router.replace(router.asPath);
+                        const noop =
+                          trip.authorId === currentUser?.id &&
+                          approvedParticipants.length > 0;
+                        const onConfirm = noop
+                          ? undefined
+                          : async () => {
+                              await submit("/api/cancel-reservation", {
+                                tripId: trip.id,
+                              });
+                              router.push("/");
+                            };
+                        setConfirmProps({
+                          body: noop ? (
+                            <p>
+                              Please transfer the organizer role to another
+                              participant before leaving the trip.
+                            </p>
+                          ) : (
+                            <p>
+                              You will leave the trip. To rejoin you must
+                              request to join again.
+                            </p>
+                          ),
+                          onConfirm,
+                        });
                       }}
                     >
                       <PersonRemove />
@@ -199,9 +231,7 @@ function TripPage({ currentUser, trip }) {
             <UserList
               title="Other Participants"
               userType="other participants"
-              users={trip.participations
-                .filter((r) => !isAuthor(r) && r.status === "APPROVED")
-                .map(({ user }) => user)}
+              users={approvedParticipants}
               actions={(user) =>
                 trip.authorId === currentUser?.id && (
                   <Dropdown>
@@ -266,9 +296,7 @@ function TripPage({ currentUser, trip }) {
               <UserList
                 title="Pending Requests"
                 userType="pending requests"
-                users={trip.participations
-                  .filter((r) => r.status === "PENDING")
-                  .map(({ user }) => user)}
+                users={pendingParticipants}
                 actions={(user) => (
                   <Button
                     className="inline-icon"
