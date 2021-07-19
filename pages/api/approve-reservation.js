@@ -17,7 +17,7 @@ export default postApi(
         userId: requestUserId,
         trip: {
           id: tripId,
-          authorId: loginUserId,
+          organizerId: loginUserId,
           // maintain invariant: a trip without `APPROVED` participations is pending deletion,
           // and must not gain new `APPROVED` participants
           participations: {

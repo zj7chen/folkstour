@@ -15,10 +15,10 @@ export default postApi(
     const { count } = await prisma.trip.updateMany({
       where: {
         id: tripId,
-        authorId: loginUserId,
+        organizerId: loginUserId,
       },
       data: {
-        authorId: requestUserId,
+        organizerId: requestUserId,
       },
     });
     if (count > 1) {

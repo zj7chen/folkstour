@@ -37,7 +37,7 @@ function UserList({ title, userType, users, actions }) {
                 className="d-flex justify-content-between align-items-center"
               >
                 <Link href={`/profile?id=${user.id}`}>
-                  <a className={styles.authorProfile}>
+                  <a className={styles.organizerProfile}>
                     <Avatar hash={user.avatarHash} />
                     <span>{user.name}</span>
                   </a>
@@ -73,13 +73,13 @@ function TripPage({ currentUser, trip }) {
   const router = useRouter();
   const [confirmProps, setConfirmProps] = useState();
 
-  function isAuthor(participation) {
-    return participation.user.id === trip.authorId;
+  function isOrganizer(participation) {
+    return participation.user.id === trip.organizerId;
   }
 
-  const author = trip.participations.find(isAuthor).user;
+  const organizer = trip.participations.find(isOrganizer).user;
   const approvedParticipants = trip.participations
-    .filter((r) => !isAuthor(r) && r.status === "APPROVED")
+    .filter((r) => !isOrganizer(r) && r.status === "APPROVED")
     .map(({ user }) => user);
   const pendingParticipants = trip.participations
     .filter((r) => r.status === "PENDING")
@@ -135,7 +135,7 @@ function TripPage({ currentUser, trip }) {
                           approvedParticipants,
                         });
                         const noop =
-                          trip.authorId === currentUser?.id &&
+                          trip.organizerId === currentUser?.id &&
                           approvedParticipants.length > 0;
                         const onConfirm = noop
                           ? undefined
@@ -221,10 +221,10 @@ function TripPage({ currentUser, trip }) {
             </section>
             <section>
               <h2>Organizer</h2>
-              <Link href={`/profile?id=${author.id}`}>
-                <a className={styles.authorProfile}>
-                  <Avatar hash={author.avatarHash} />
-                  <span>{author.name}</span>
+              <Link href={`/profile?id=${organizer.id}`}>
+                <a className={styles.organizerProfile}>
+                  <Avatar hash={organizer.avatarHash} />
+                  <span>{organizer.name}</span>
                 </a>
               </Link>
             </section>
@@ -233,7 +233,7 @@ function TripPage({ currentUser, trip }) {
               userType="other participants"
               users={approvedParticipants}
               actions={(user) =>
-                trip.authorId === currentUser?.id && (
+                trip.organizerId === currentUser?.id && (
                   <Dropdown>
                     <Dropdown.Toggle
                       as={EllipsisToggle}
@@ -292,7 +292,7 @@ function TripPage({ currentUser, trip }) {
                 )
               }
             />
-            {trip.authoredByCurrentUser && (
+            {trip.organizedByCurrentUser && (
               <UserList
                 title="Pending Requests"
                 userType="pending requests"
@@ -330,7 +330,7 @@ export const getServerSideProps = withSessionProps(
         select: {
           id: true,
           title: true,
-          authorId: true,
+          organizerId: true,
           genderRequirement: true,
           tripBeginTime: true,
           tripEndTime: true,
@@ -373,7 +373,7 @@ export const getServerSideProps = withSessionProps(
       return { notFound: true };
     }
     const {
-      authorId,
+      organizerId,
       tripBeginTime,
       tripEndTime,
       transports,
@@ -387,16 +387,16 @@ export const getServerSideProps = withSessionProps(
       props: {
         trip: {
           ...rest,
-          authorId,
+          organizerId,
           tripBeginTime: tripBeginTime.toISOString(),
           tripEndTime: tripEndTime.toISOString(),
           transports: transports.map(({ transport }) => transport),
           // {city, province, country}[]
           locations: locations.map(({ location }) => location),
           expectedExpense: expectedExpense.toJSON(),
-          authoredByCurrentUser: authorId === userId,
+          organizedByCurrentUser: organizerId === userId,
           participations:
-            authorId === userId
+            organizerId === userId
               ? participations
               : participations.filter((r) => r.status == "APPROVED"),
           reservationStatus:

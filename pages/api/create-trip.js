@@ -39,7 +39,7 @@ export default postApi(
         teamSize,
         expectedExpense: expense,
         genderRequirement: gender,
-        author: { connect: { id: userId } },
+        organizer: { connect: { id: userId } },
         participations: {
           create: {
             userId,

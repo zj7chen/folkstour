@@ -24,12 +24,12 @@ export default postApi(
       where: {
         userId: requestUserId ?? loginUserId,
         tripId,
-        // permission check: only user or trip author can perform this operation
+        // permission check: only user or trip organizer can perform this operation
         OR: [
           {
             trip: {
-              // we are the author of the trip
-              authorId: loginUserId,
+              // we are the organizer of the trip
+              organizerId: loginUserId,
               // we are the only one left in the trip
               // (`every` because prisma doesn't support `count` here)
               participations: {
@@ -42,15 +42,15 @@ export default postApi(
           {
             userId: { not: loginUserId },
             trip: {
-              // we are the author of the trip
-              authorId: loginUserId,
+              // we are the organizer of the trip
+              organizerId: loginUserId,
             },
           },
           {
             userId: loginUserId,
             trip: {
-              // we are the author of the trip
-              authorId: { not: loginUserId },
+              // we are not the organizer of the trip
+              organizerId: { not: loginUserId },
             },
           },
         ],

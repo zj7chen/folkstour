@@ -23,7 +23,7 @@ function Dashboard({ currentUser, trips }) {
                 id,
                 title,
                 tripBeginTime,
-                authorId,
+                organizerId,
                 numPendingRequests,
                 reservationStatus,
               }) => (
@@ -41,7 +41,7 @@ function Dashboard({ currentUser, trips }) {
                         : ""}
                     </div>
                   </div>
-                  {authorId === currentUser.id ? (
+                  {organizerId === currentUser.id ? (
                     <div className="text-muted inline-icon">
                       <Flag />
                       <span>Organizer</span>
@@ -89,7 +89,7 @@ export const getServerSideProps = withSessionProps(
         id: true,
         title: true,
         tripBeginTime: true,
-        authorId: true,
+        organizerId: true,
         participations: {
           select: {
             userId: true,
@@ -99,9 +99,9 @@ export const getServerSideProps = withSessionProps(
       },
       where: {
         OR: [
-          { authorId: userId },
+          { organizerId: userId },
           {
-            authorId: {
+            organizerId: {
               not: userId,
             },
             participations: {
@@ -117,16 +117,16 @@ export const getServerSideProps = withSessionProps(
     return {
       props: {
         trips: trips.map(
-          ({ tripBeginTime, participations, authorId, ...rest }) => ({
+          ({ tripBeginTime, participations, organizerId, ...rest }) => ({
             ...rest,
             tripBeginTime: tripBeginTime.toISOString(),
             reservationStatus: participations.find((r) => r.userId === userId)
               .status,
             numPendingRequests:
-              authorId === userId
+              organizerId === userId
                 ? participations.filter((r) => r.status === "PENDING").length
                 : null,
-            authorId,
+            organizerId,
           })
         ),
       },

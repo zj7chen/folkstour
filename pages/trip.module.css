@@ -1,8 +1,8 @@
-.authorProfile {
+.organizerProfile {
   font-weight: 600;
 }
 
-.authorProfile > img {
+.organizerProfile > img {
   margin-right: 0.5rem;
   width: 3rem;
 }

@@ -36,8 +36,8 @@ model Trip {
   tripEndTime       DateTime
   description       String            @db.VarChar(4000)
   teamSize          TeamSize
-  author            User              @relation(fields: [authorId], references: [id])
-  authorId          Int
+  organizer         User              @relation(fields: [organizerId], references: [id])
+  organizerId       Int
   expectedExpense   Decimal
   genderRequirement GenderRequirement
   participations    Participation[]
