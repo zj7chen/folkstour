@@ -66,7 +66,7 @@ function SearchTripForm(props) {
           name="location"
           value={location}
           onChange={(location) =>
-            update({ location: JSON.stringify(location) })
+            update({ location: location ? JSON.stringify(location) : "" })
           }
           placeholder="Narrow by location"
         />

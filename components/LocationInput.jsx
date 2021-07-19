@@ -36,9 +36,12 @@ function LocationInput({ isMulti, value, onChange, ...props }) {
           : null
       }
       onChange={(selected) =>
-        onChange(isMulti ? selected.map((o) => o.value) : selected.value)
+        onChange(
+          isMulti ? selected.map((o) => o.value) : selected?.value ?? null
+        )
       }
       isMulti={isMulti}
+      isClearable
       cacheOptions
       loadOptions={(inputValue, callback) => {
         clearTimeout(handle);
