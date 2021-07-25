@@ -12,12 +12,16 @@ generator client {
 }
 
 model TripLocation {
-  id       Int  @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   tripId   Int
-  trip     Trip @relation(fields: [tripId], references: [id])
-  // {city, province, country}
-  location Json
+  trip     Trip   @relation(fields: [tripId], references: [id])
+  city     String
+  province String
+  country  String
   order    Int
+
+  @@unique([tripId, city, province, country])
+  @@index([city, province, country])
 }
 
 model TripTransport {
@@ -25,6 +29,9 @@ model TripTransport {
   tripId    Int
   trip      Trip      @relation(fields: [tripId], references: [id])
   transport Transport
+
+  @@unique([tripId, transport])
+  @@index([transport])
 }
 
 model Trip {
@@ -43,6 +50,12 @@ model Trip {
   participations    Participation[]
   locations         TripLocation[]
   transports        TripTransport[]
+
+  @@index([organizerId])
+  @@index([tripBeginTime, tripEndTime])
+  @@index([genderRequirement])
+  @@index([teamSize])
+  @@index([expectedExpense])
 }
 
 enum TeamSize {
@@ -82,6 +95,7 @@ model Participation {
   status ReservationStatus
 
   @@unique([tripId, userId])
+  @@index([userId])
 }
 
 model Ban {
@@ -96,7 +110,7 @@ model User {
   id         Int     @id @default(autoincrement())
   email      String
   password   String
-  name       String  @default("")
+  name       String
   selfIntro  String  @default("") @db.VarChar(4000)
   avatarHash String?
   avatar     Image?  @relation(fields: [avatarHash], references: [hash])

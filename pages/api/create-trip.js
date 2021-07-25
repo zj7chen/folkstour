@@ -23,8 +23,10 @@ export default postApi(
       data: {
         locations: {
           createMany: {
-            data: locations.map((location, order) => ({
-              location,
+            data: locations.map(({ city, province, country }, order) => ({
+              city,
+              province,
+              country,
               order,
             })),
           },

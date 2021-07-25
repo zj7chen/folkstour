@@ -347,7 +347,9 @@ export const getServerSideProps = withSessionProps(
               order: "asc",
             },
             select: {
-              location: true,
+              city: true,
+              province: true,
+              country: true,
             },
           },
           participations: {
@@ -377,7 +379,6 @@ export const getServerSideProps = withSessionProps(
       tripBeginTime,
       tripEndTime,
       transports,
-      locations,
       expectedExpense,
       participations,
       ...rest
@@ -391,8 +392,6 @@ export const getServerSideProps = withSessionProps(
           tripBeginTime: tripBeginTime.toISOString(),
           tripEndTime: tripEndTime.toISOString(),
           transports: transports.map(({ transport }) => transport),
-          // {city, province, country}[]
-          locations: locations.map(({ location }) => location),
           expectedExpense: expectedExpense.toJSON(),
           organizedByCurrentUser: organizerId === userId,
           participations:
