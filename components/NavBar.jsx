@@ -20,7 +20,7 @@ function NavBar({ currentUser, landing }) {
       style={{ minHeight: "3.5rem" }}
     >
       <Link href="/" passHref>
-        <Navbar.Brand>TripMate</Navbar.Brand>
+        <Navbar.Brand>FolksTour</Navbar.Brand>
       </Link>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">

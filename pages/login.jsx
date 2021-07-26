@@ -75,7 +75,7 @@ function LoginPage() {
                   <Modal.Title as="h1">
                     {values.signingUp
                       ? "Create your account"
-                      : "Sign in to TripMate"}
+                      : "Sign in to FolksTour"}
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

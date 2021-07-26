@@ -1,4 +1,4 @@
-# TripMate
+# FolksTour
 
 Prisma
 
