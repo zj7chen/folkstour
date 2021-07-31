@@ -3,6 +3,7 @@ import DateInput from "components/DateInput";
 import LocationInput from "components/LocationInput";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Feedback from "react-bootstrap/Feedback";
 import Form from "react-bootstrap/Form";
 
 function useInput(state, f) {
@@ -76,7 +77,7 @@ function SearchTripForm(props) {
         />
       </Form.Group>
 
-      <Form.Group controlId="dates">
+      <Form.Group>
         <Form.Label>Choose your dates</Form.Label>
         <DateInput
           name="dates"
@@ -84,10 +85,16 @@ function SearchTripForm(props) {
           onChange={({ start, end }) => {
             setDates({ start, end });
             update({
-              dates: start && end ? [start, end].join(",") : "",
+              dates: start && end && start <= end ? [start, end].join(",") : "",
             });
           }}
         />
+        <Feedback type="invalid" style={{ display: "block" }}>
+          {dates.start &&
+            dates.end &&
+            dates.start > dates.end &&
+            "end date must not be earlier than start date"}
+        </Feedback>
       </Form.Group>
 
       <Form.Group>
