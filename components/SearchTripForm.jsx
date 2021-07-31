@@ -41,7 +41,11 @@ function SearchTripForm(props) {
 
   function update(changes) {
     // FIXME: prevent navigation on unchanged params
-    const query = { ...router.query, ...changes };
+    const { query } = router;
+    for (const [key, val] of Object.entries(changes)) {
+      if (val !== "") query[key] = val;
+      else delete query[key];
+    }
     router.push({ query });
   }
 
