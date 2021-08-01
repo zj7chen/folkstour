@@ -10,3 +10,14 @@
   flex-grow: 1;
   align-self: center;
 }
+
+.noResults {
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.noResults > svg {
+  max-width: 8rem;
+  color: #adb5bd;
+  fill: #adb5bd;
+}

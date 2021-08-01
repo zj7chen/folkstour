@@ -1,4 +1,5 @@
 import { searchTripSchema } from "client/validate";
+import InformationCircleOutline from "components/icons/InformationCircleOutline";
 import SearchTripForm from "components/SearchTripForm";
 import StickyLayout from "components/StickyLayout";
 import TripCapacity from "components/TripCapacity";
@@ -13,24 +14,35 @@ function SearchTripPage({ currentUser, trips }) {
     <StickyLayout
       currentUser={currentUser}
       side={<SearchTripForm />}
-      main={trips.map((trip) => (
-        <TripCard key={trip.id} trip={trip}>
-          <TripFromTo
-            startLocation={trip.startLocation}
-            endLocation={trip.endLocation}
-            startDate={new Date(trip.tripBeginTime)}
-            endDate={new Date(trip.tripEndTime)}
-            length={trip.numLocations}
-          />
-          <div className={styles.capacity}>
-            <div>Capacity:</div>
-            <TripCapacity
-              teamSize={trip.teamSize}
-              numParticipants={trip.numParticipants}
-            />
+      main={
+        trips.length === 0 ? (
+          <div className={styles.noResults}>
+            <InformationCircleOutline />
+            <p className="text-muted">
+              No trips found that matches the current search criteria
+            </p>
           </div>
-        </TripCard>
-      ))}
+        ) : (
+          trips.map((trip) => (
+            <TripCard key={trip.id} trip={trip}>
+              <TripFromTo
+                startLocation={trip.startLocation}
+                endLocation={trip.endLocation}
+                startDate={new Date(trip.tripBeginTime)}
+                endDate={new Date(trip.tripEndTime)}
+                length={trip.numLocations}
+              />
+              <div className={styles.capacity}>
+                <div>Capacity:</div>
+                <TripCapacity
+                  teamSize={trip.teamSize}
+                  numParticipants={trip.numParticipants}
+                />
+              </div>
+            </TripCard>
+          ))
+        )
+      }
     />
   );
 }
