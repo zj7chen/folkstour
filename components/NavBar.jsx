@@ -1,5 +1,6 @@
 import submit from "client/submit";
 import Avatar from "components/Avatar";
+import Logo from "components/icons/Logo";
 import LocationSearch from "components/LocationSearch";
 import searchStyles from "components/LocationSearchNav.module.css";
 import Link from "next/link";
@@ -20,7 +21,9 @@ function NavBar({ currentUser, landing }) {
       style={{ minHeight: "3.5rem" }}
     >
       <Link href="/" passHref>
-        <Navbar.Brand>FolksTour</Navbar.Brand>
+        <Navbar.Brand>
+          <Logo /> FolksTour
+        </Navbar.Brand>
       </Link>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
