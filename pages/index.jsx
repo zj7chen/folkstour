@@ -7,6 +7,7 @@ import NavBar from "components/NavBar";
 import { Timeline, TimelineItem } from "components/Timeline";
 import Link from "next/link";
 import Container from "react-bootstrap/Container";
+import prisma from "server/prisma";
 import { withSessionProps } from "server/session";
 
 function Dashboard({ currentUser, trips }) {
